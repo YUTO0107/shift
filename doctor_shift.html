@@ -360,7 +360,14 @@ const TY={'full-time':{label:'常勤',color:'#3b82f6'},'part-time':{label:'非�
 let S={shifts:[],stamps:[{id:'s1',name:'日勤',type:'full-time',place:'常勤先病院',start:'09:00',end:'17:00',amount:0,transport:0,memo:''},{id:'s2',name:'外勤A',type:'part-time',place:'外勤クリニック',start:'09:00',end:'13:00',amount:50000,transport:1000,memo:''},{id:'s3',name:'スポット午前',type:'spot',place:'',start:'09:00',end:'13:00',amount:45000,transport:0,memo:''},{id:'s4',name:'スポット午後',type:'spot',place:'',start:'14:00',end:'18:00',amount:45000,transport:0,memo:''},{id:'s5',name:'待機',type:'oncall',place:'常勤先病院',start:'17:00',end:'09:00',amount:20000,transport:0,memo:''}],settings:{incomeTax:10,residentTax:10},ft:{name:'',annualGross:0,monthlyNet:0,payday:25,bonusNet:0},curM:new Date().getFullYear()*100+new Date().getMonth()+1,calM:new Date().getFullYear()*100+new Date().getMonth()+1,incM:new Date().getFullYear()*100+new Date().getMonth()+1};
 let aStamp=null,editId=null,cType='full-time',cSType='full-time',mDates=[],eSId=null,curDspDate=null;
 
-function load(){try{const d=localStorage.getItem('ds6');if(d){const p=JSON.parse(d);['shifts','stamps','settings','ft'].forEach(k=>{if(p[k])S[k]=p[k];});}}catch(e){}loadUI();}
+function load(){
+  try{
+    // 新しいキーを優先、なければ古いキーから読み込む
+    let d=localStorage.getItem('ds6')||localStorage.getItem('ds5')||localStorage.getItem('ds4')||localStorage.getItem('ds3');
+    if(d){const p=JSON.parse(d);['shifts','stamps','settings','ft'].forEach(k=>{if(p[k])S[k]=p[k];}); }
+  }catch(e){}
+  loadUI();
+}
 function save(){localStorage.setItem('ds6',JSON.stringify({shifts:S.shifts,stamps:S.stamps,settings:S.settings,ft:S.ft}));}
 function loadUI(){const s=S.settings,ft=S.ft;g('s-itax').value=s.incomeTax||10;g('s-rtax').value=s.residentTax||10;g('s-ft-name').value=ft.name||'';g('s-ft-annual').value=ft.annualGross||'';g('s-ft-net').value=ft.monthlyNet||'';g('s-ft-payday').value=ft.payday||25;g('s-ft-bonus').value=ft.bonusNet||'';renderFtPrev();}
 function saveSetting(k,v){S.settings[k]=parseFloat(v)||0;save();}
