@@ -334,6 +334,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 </div>
 
 <script>
+
+// 日本の祝日
+const HOLIDAYS = {
+  // 2025
+  '2025-01-01':'元日','2025-01-13':'成人の日','2025-02-11':'建国記念の日','2025-02-23':'天皇誕生日',
+  '2025-02-24':'天皇誕生日 振替','2025-03-20':'春分の日','2025-04-29':'昭和の日',
+  '2025-05-03':'憲法記念日','2025-05-04':'みどりの日','2025-05-05':'こどもの日','2025-05-06':'こどもの日 振替',
+  '2025-07-21':'海の日','2025-08-11':'山の日','2025-09-15':'敬老の日','2025-09-23':'秋分の日',
+  '2025-10-13':'スポーツの日','2025-11-03':'文化の日','2025-11-23':'勤労感謝の日','2025-11-24':'勤労感謝の日 振替',
+  // 2026
+  '2026-01-01':'元日','2026-01-12':'成人の日','2026-02-11':'建国記念の日','2026-02-23':'天皇誕生日',
+  '2026-03-20':'春分の日','2026-04-29':'昭和の日','2026-05-03':'憲法記念日','2026-05-04':'みどりの日',
+  '2026-05-05':'こどもの日','2026-05-06':'みどりの日 振替','2026-07-20':'海の日','2026-08-11':'山の日',
+  '2026-09-21':'敬老の日','2026-09-22':'国民の休日','2026-09-23':'秋分の日','2026-10-12':'スポーツの日',
+  '2026-11-03':'文化の日','2026-11-23':'勤労感謝の日',
+  // 2027
+  '2027-01-01':'元日','2027-01-11':'成人の日','2027-02-11':'建国記念の日','2027-02-23':'天皇誕生日',
+  '2027-03-21':'春分の日','2027-04-29':'昭和の日','2027-05-03':'憲法記念日','2027-05-04':'みどりの日',
+  '2027-05-05':'こどもの日','2027-07-19':'海の日','2027-08-11':'山の日','2027-08-12':'山の日 振替',
+  '2027-09-20':'敬老の日','2027-09-23':'秋分の日','2027-10-11':'スポーツの日',
+  '2027-11-03':'文化の日','2027-11-23':'勤労感謝の日',
+};
 const TY={'full-time':{label:'常勤',color:'#3b82f6'},'part-time':{label:'非常勤',color:'#10b981'},'spot':{label:'スポット',color:'#f59e0b'},'oncall':{label:'オンコール',color:'#ef4444'}};
 let S={shifts:[],stamps:[{id:'s1',name:'日勤',type:'full-time',place:'常勤先病院',start:'09:00',end:'17:00',amount:0,transport:0,memo:''},{id:'s2',name:'外勤A',type:'part-time',place:'外勤クリニック',start:'09:00',end:'13:00',amount:50000,transport:1000,memo:''},{id:'s3',name:'スポット午前',type:'spot',place:'',start:'09:00',end:'13:00',amount:45000,transport:0,memo:''},{id:'s4',name:'スポット午後',type:'spot',place:'',start:'14:00',end:'18:00',amount:45000,transport:0,memo:''},{id:'s5',name:'待機',type:'oncall',place:'常勤先病院',start:'17:00',end:'09:00',amount:20000,transport:0,memo:''}],settings:{incomeTax:10,residentTax:10},ft:{name:'',annualGross:0,monthlyNet:0,payday:25,bonusNet:0},curM:new Date().getFullYear()*100+new Date().getMonth()+1,calM:new Date().getFullYear()*100+new Date().getMonth()+1,incM:new Date().getFullYear()*100+new Date().getMonth()+1};
 let aStamp=null,editId=null,cType='full-time',cSType='full-time',mDates=[],eSId=null,curDspDate=null;
@@ -426,9 +448,14 @@ function updCalTotal(){
 }
 function dCell(d,today,other){
   const dow=d.getDay(),ds=d.toISOString().split('T')[0],isT=d.getTime()===today.getTime(),isSel=mDates.includes(ds),ds2=S.shifts.filter(s=>s.date===ds);
-  let dots=ds2.slice(0,2).map(s=>{const sn=getSN(s)||TY[s.type].label;return`<div class="sh ${s.type}" onclick="openDet('${s.id}');event.stopPropagation()">${sn}</div>`;}).join('');
+  const hname=HOLIDAYS[ds];
+  const isHol=hname||dow===0;
+  let dots='';
+  if(hname&&!other)dots+=`<div style="font-size:8px;color:var(--red);font-weight:600;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2">${hname}</div>`;
+  dots+=ds2.slice(0,2).map(s=>{const sn=getSN(s)||TY[s.type].label;return`<div class="sh ${s.type}" onclick="openDet('${s.id}');event.stopPropagation()">${sn}</div>`;}).join('');
   if(ds2.length>2)dots+=`<div class="ms">+${ds2.length-2}</div>`;
-  const cls=[other?'om':'',dow===0?'sun':dow===6?'sat':'',isSel?'sel':''].filter(Boolean).join(' ');
+  const isRed=dow===0||hname;
+  const cls=[other?'om':'',isRed?'sun':dow===6?'sat':'',isSel?'sel':''].filter(Boolean).join(' ');
   return `<div class="cd ${cls}" onclick="onDay('${ds}')"><div class="dn ${isT?'td':''}">${d.getDate()}</div>${dots}</div>`;
 }
 function onDay(ds){
