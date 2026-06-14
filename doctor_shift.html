@@ -6,6 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="勤務管理">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMWU0MGFmIi8+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjgsMjIpIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMTAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTMwIDEwIEMzMCAxMCAyMCAxMCAyMCAzMCBMMjAgNzAgQzIwIDEwMCA1MCAxMTUgNjUgMTE1IEM4MCAxMTUgMTEwIDEwMCAxMTAgNzAgTDExMCAzMCBDMTEwIDEwIDEwMCAxMCAxMDAgMTAiLz48Y2lyY2xlIGN4PSI2NSIgY3k9IjExOCIgcj0iMTQiIGZpbGw9IiMzYjgyZjYiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI4Ii8+PHBhdGggZD0iTTY1IDEzMiBMNjUgMTQ4IEM2NSAxNTggNzUgMTY1IDg1IDE2MCBDMTAwIDE1MyAxMDggMTM4IDEwOCAxMjIiIHN0cm9rZS13aWR0aD0iOSIvPjxjaXJjbGUgY3g9IjEwOCIgY3k9IjExOCIgcj0iMTAiIGZpbGw9IiNmZmYiIHN0cm9rZT0ibm9uZSIvPjxjaXJjbGUgY3g9IjIyIiBjeT0iMTAiIHI9IjciIGZpbGw9IiM2MGE1ZmEiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI1Ii8+PGNpcmNsZSBjeD0iMTA4IiBjeT0iMTAiIHI9IjciIGZpbGw9IiM2MGE1ZmEiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI1Ii8+PC9nPjwvc3ZnPg==">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMWU0MGFmIi8+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjgsMjIpIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMTAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTMwIDEwIEMzMCAxMCAyMCAxMCAyMCAzMCBMMjAgNzAgQzIwIDEwMCA1MCAxMTUgNjUgMTE1IEM4MCAxMTUgMTEwIDEwMCAxMTAgNzAgTDExMCAzMCBDMTEwIDEwIDEwMCAxMCAxMDAgMTAiLz48Y2lyY2xlIGN4PSI2NSIgY3k9IjExOCIgcj0iMTQiIGZpbGw9IiMzYjgyZjYiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI4Ii8+PHBhdGggZD0iTTY1IDEzMiBMNjUgMTQ4IEM2NSAxNTggNzUgMTY1IDg1IDE2MCBDMTAwIDE1MyAxMDggMTM4IDEwOCAxMjIiIHN0cm9rZS13aWR0aD0iOSIvPjxjaXJjbGUgY3g9IjEwOCIgY3k9IjExOCIgcj0iMTAiIGZpbGw9IiNmZmYiIHN0cm9rZT0ibm9uZSIvPjxjaXJjbGUgY3g9IjIyIiBjeT0iMTAiIHI9IjciIGZpbGw9IiM2MGE1ZmEiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI1Ii8+PGNpcmNsZSBjeD0iMTA4IiBjeT0iMTAiIHI9IjciIGZpbGw9IiM2MGE1ZmEiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI1Ii8+PC9nPjwvc3ZnPg==">
 <title>医師 勤務管理</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.9.0/dist/tabler-icons.min.css">
 <style>
@@ -362,9 +364,19 @@ let aStamp=null,editId=null,cType='full-time',cSType='full-time',mDates=[],eSId=
 
 function load(){
   try{
-    // 新しいキーを優先、なければ古いキーから読み込む
-    let d=localStorage.getItem('ds6')||localStorage.getItem('ds5')||localStorage.getItem('ds4')||localStorage.getItem('ds3');
-    if(d){const p=JSON.parse(d);['shifts','stamps','settings','ft'].forEach(k=>{if(p[k])S[k]=p[k];}); }
+    const keys=['ds6','ds5','ds4','ds3','docshift2','docshift'];
+    for(const k of keys){
+      const raw=localStorage.getItem(k);
+      if(raw){
+        const p=JSON.parse(raw);
+        if(p.stamps&&p.stamps.length>0){
+          ['shifts','stamps','settings','ft'].forEach(key=>{if(p[key])S[key]=p[key];});
+          // 見つかったら最新キーに保存し直す
+          localStorage.setItem('ds6',JSON.stringify({shifts:S.shifts,stamps:S.stamps,settings:S.settings,ft:S.ft}));
+          break;
+        }
+      }
+    }
   }catch(e){}
   loadUI();
 }
