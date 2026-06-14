@@ -50,7 +50,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;ba
 .dc{text-align:center;padding:5px 0;font-size:11px;font-weight:500;color:var(--text2)}
 .dc:first-child{color:var(--red)}.dc:last-child{color:var(--blue)}
 .cg{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border)}
-.cd{background:var(--bg2);min-height:66px;padding:3px 2px;cursor:pointer}
+.cd{background:var(--bg2);min-height:58px;padding:3px 2px;cursor:pointer}
 .cd:active{background:var(--bg3)}
 .cd.om .dn{color:var(--text3)!important}
 .cd.sel{background:var(--blue-bg)}
@@ -177,7 +177,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;ba
       <div class="dr">
         <div class="dc">日</div><div class="dc">月</div><div class="dc">火</div><div class="dc">水</div><div class="dc">木</div><div class="dc">金</div><div class="dc">土</div>
       </div>
-      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch">
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0">
         <div class="cg" id="cal-grid"></div>
       </div>
       <div class="sp">
