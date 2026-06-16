@@ -660,7 +660,7 @@ function updShTotal(){
   g('sh-sub').textContent=`常勤¥${fmt(fg)} + バイト¥${fmt(bg)}`;
 }
 function onShDay(ds){
-  selDate.sh=ds;renderCal('sh');
+  selDate.sh=ds;
   if(aStamp){if(mDates.length>0){const i=mDates.indexOf(ds);if(i>=0)mDates.splice(i,1);else mDates.push(ds);updMulti();renderCal('sh');}else addFS(ds,aStamp);}
   else openDsp(ds);
 }
@@ -937,7 +937,7 @@ function selSchStamp(id){
   renderSchStamps();
 }
 function onSchStampDay(ds){
-  selDate.sch=ds;renderCal('sch');
+  selDate.sch=ds;
   if(activeSchStamp){
     S.schedules.push({id:'sc'+Date.now()+Math.random().toString(36).slice(2),date:ds,type:activeSchStamp.type,title:activeSchStamp.title,start:activeSchStamp.start,end:activeSchStamp.end,memo:activeSchStamp.memo,stampId:activeSchStamp.id});
     save();renderCal('sch');renderHome();
@@ -984,20 +984,35 @@ function showPopoverByDs(ds){
 function buildPopoverContent(ds){
   const d=new Date(ds);
   const dow=['日','月','火','水','木','金','土'][d.getDay()];
-  document.getElementById('popover-date').textContent=`${d.getMonth()+1}月${d.getDate()}日(${dow})`;
+  document.getElementById('popover-date').textContent=(d.getMonth()+1)+'月'+d.getDate()+'日('+dow+')';
   const items=[];
-  S.shifts.filter(s=>s.date===ds).forEach(s=>{const t=SHIFT_TY[s.type];items.push({color:t.color,name:getSN(s)||s.place||t.label,time:`${s.start}〜${s.end}`,onclick:`openShiftDet('${s.id}');closePopover()`});});
-  S.schedules.filter(s=>s.date===ds).forEach(s=>{const c=SCH_TY[s.type]?.color||'#888';items.push({color:c,name:s.title,time:`${s.start}〜${s.end}`,onclick:`openSchDet('${s.id}');closePopover()`});});
-  S.workouts.filter(w=>w.date===ds).forEach(w=>{const m=MUSCLES[w.muscle];items.push({color:m?.color||'#888',name:'💪 '+(m?.label||w.muscle),time:'',onclick:`openWkDet('${w.id}');closePopover()`});});
-  if(items.length===0){closePopover();onSchDay(ds);return;}
-  // + 新規追加ボタン
-  items.push({color:'var(--text3)',name:'+ 予定を追加',time:'',onclick:`closePopover();onSchDay('${ds}')`});
-  document.getElementById('popover-items').innerHTML=items.map(it=>`
-    <div class="popover-item" onclick="${it.onclick}">
-      <div class="popover-dot" style="background:${it.color}"></div>
-      <div style="flex:1"><div class="popover-name">${it.name}</div>${it.time?`<div class="popover-time">${it.time}</div>`:''}</div>
-      <i class="ti ti-chevron-right" style="color:var(--text3);font-size:14px"></i>
-    </div>`).join('');
+  S.shifts.filter(function(s){return s.date===ds;}).forEach(function(s){
+    const t=SHIFT_TY[s.type];
+    items.push({color:t.color,name:getSN(s)||s.place||t.label,time:s.start+'〜'+s.end,id:s.id,kind:'shift'});
+  });
+  S.schedules.filter(function(s){return s.date===ds;}).forEach(function(s){
+    const c=(SCH_TY[s.type]&&SCH_TY[s.type].color)||'#888';
+    items.push({color:c,name:s.title,time:s.start+'〜'+s.end,id:s.id,kind:'sch'});
+  });
+  S.workouts.filter(function(w){return w.date===ds;}).forEach(function(w){
+    const m=MUSCLES[w.muscle];
+    items.push({color:(m&&m.color)||'#888',name:'💪 '+((m&&m.label)||w.muscle),time:'',id:w.id,kind:'wk'});
+  });
+  items.push({color:'var(--blue)',name:'+ 予定を追加',time:'',id:ds,kind:'add'});
+  let html='';
+  items.forEach(function(it){
+    let fn='';
+    if(it.kind==='shift')fn='openShiftDet("'+it.id+'");closePopover()';
+    else if(it.kind==='sch')fn='openSchDet("'+it.id+'");closePopover()';
+    else if(it.kind==='wk')fn='openWkDet("'+it.id+'");closePopover()';
+    else fn='closePopover();onSchDay("'+it.id+'")';
+    html+='<div class="popover-item" onclick=''+fn+''>';
+    html+='<div class="popover-dot" style="background:'+it.color+'"></div>';
+    html+='<div style="flex:1"><div class="popover-name">'+it.name+'</div>';
+    if(it.time)html+='<div class="popover-time">'+it.time+'</div>';
+    html+='</div><i class="ti ti-chevron-right" style="color:var(--text3);font-size:14px"></i></div>';
+  });
+  document.getElementById('popover-items').innerHTML=html;
 }
 
 function showPopover(e, ds){
@@ -1005,7 +1020,6 @@ function showPopover(e, ds){
   const pop=document.getElementById('popover');
   const backdrop=document.getElementById('popover-backdrop');
   buildPopoverContent(ds);
-  if(document.getElementById('popover').style.display==='none')return;
 
   // 位置計算
   pop.style.display='block';
