@@ -60,6 +60,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .cd{background:var(--bg2);min-height:56px;padding:3px 2px;cursor:pointer}
 .cd:active{background:var(--bg3)}
 .cd.om .dn{color:var(--text3)!important}.cd.sel{background:var(--blue-bg)}
+.cd.today-sel{background:var(--blue-bg)}
+.cd.tapped{background:var(--bg3);transition:background 0.1s}
 .dn{font-size:12px;font-weight:500;margin-bottom:1px;width:22px;height:22px;display:flex;align-items:center;justify-content:center}
 .dn.td{background:var(--blue);color:#fff;border-radius:50%}
 .cd.sun .dn{color:var(--red)}.cd.sat .dn{color:var(--blue)}.cd.om .dn{color:var(--text3)!important}
@@ -522,7 +524,7 @@ let S={
 };
 
 let aStamp=null,editId=null,cType='full-time',cSType='full-time',mDates=[],eSId=null;
-let curDspDate=null,curSchDate=null,curWkDate=null;
+let curDspDate=null,curSchDate=null,curWkDate=null,selDate={sh:null,sch:null,wk:null};
 let selSchType_v='work',selWkMuscles=[];
 let bulkTargetM=nowYM();
 let editSchId=null,editWkId=null;
@@ -621,7 +623,7 @@ function dCell(mode,d,today,other,mon){
   const dow=d.getDay(),ds=toDS(d),isT=d.getTime()===today.getTime();
   const hname=HOLIDAYS[ds];
   const isRed=dow===0||hname,isSat=dow===6;
-  const cls=[other?'om':'',isRed?'sun':isSat?'sat':''].filter(Boolean).join(' ');
+  const cls=[other?'om':'',isRed?'sun':isSat?'sat':'',isSeld&&!isT?'sel':''].filter(Boolean).join(' ');
   let dots='';
   if(hname&&!other)dots+=`<div style="font-size:7px;color:var(--red);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;margin-bottom:1px">${hname}</div>`;
   if(mode==='sh'){
@@ -646,10 +648,8 @@ function dCell(mode,d,today,other,mon){
   }
   const onclick=mode==='sh'?`onShDay('${ds}')`:mode==='wk'?`onWkStampDay('${ds}')`:mode==='sch'?`onSchStampDay('${ds}')`:`onSchDay('${ds}')`;
   // +N がある場合はカードタップでポップオーバー
-  const totalEvs=mode==='sch'?(S.schedules.filter(s=>s.date===ds).length+S.shifts.filter(s=>s.date===ds).length+S.workouts.filter(w=>w.date===ds).length):0;
-  const hasMore=mode==='sch'&&totalEvs>0&&!activeSchStamp;
-  const clickHandler=hasMore?`showPopover(event,'${ds}')`:onclick;
-  return `<div class="cd ${cls}" onclick="${clickHandler}"><div class="dn ${isT?'td':''}">${d.getDate()}</div>${dots}</div>`;
+  const isSeld=selDate[mode]===ds;
+  return `<div class="cd ${cls}" onclick="${onclick}"><div class="dn ${isT?'td':''}">${d.getDate()}</div>${dots}</div>`;
 }
 
 // SHIFT
@@ -660,6 +660,7 @@ function updShTotal(){
   g('sh-sub').textContent=`常勤¥${fmt(fg)} + バイト¥${fmt(bg)}`;
 }
 function onShDay(ds){
+  selDate.sh=ds;renderCal('sh');
   if(aStamp){if(mDates.length>0){const i=mDates.indexOf(ds);if(i>=0)mDates.splice(i,1);else mDates.push(ds);updMulti();renderCal('sh');}else addFS(ds,aStamp);}
   else openDsp(ds);
 }
@@ -891,6 +892,7 @@ function selWkStamp(muscle){
   renderWkStamps();
 }
 function onWkStampDay(ds){
+  selDate.wk=ds;
   if(activeWkMuscle){
     const exists=S.workouts.some(w=>w.date===ds&&w.muscle===activeWkMuscle);
     if(!exists){
@@ -935,15 +937,15 @@ function selSchStamp(id){
   renderSchStamps();
 }
 function onSchStampDay(ds){
+  selDate.sch=ds;renderCal('sch');
   if(activeSchStamp){
     S.schedules.push({id:'sc'+Date.now()+Math.random().toString(36).slice(2),date:ds,type:activeSchStamp.type,title:activeSchStamp.title,start:activeSchStamp.start,end:activeSchStamp.end,memo:activeSchStamp.memo,stampId:activeSchStamp.id});
     save();renderCal('sch');renderHome();
   } else {
-    // スタンプ未選択：その日のイベントがあればポップオーバー、なければ追加モーダル
+    // スタンプ未選択：ポップオーバー表示
     const hasEvs=S.schedules.some(s=>s.date===ds)||S.shifts.some(s=>s.date===ds)||S.workouts.some(w=>w.date===ds);
     if(hasEvs){
-      // ポップオーバーはdCellのclickから呼ばれるので、ここではschDayを開く
-      onSchDay(ds);
+      showPopoverByDs(ds);
     } else {
       onSchDay(ds);
     }
@@ -964,40 +966,46 @@ function saveSchStamp(){
 }
 
 // ポップオーバー
+function showPopoverByDs(ds){
+  // カレンダーセルを探してポップオーバーを表示
+  const cells=document.querySelectorAll('#sch-grid .cd');
+  for(const cell of cells){
+    const onclick=cell.getAttribute('onclick')||'';
+    if(onclick.includes(ds)){showPopover({currentTarget:cell,stopPropagation:()=>{}},ds);return;}
+  }
+  // 見つからなければ画面中央に表示
+  const pop=document.getElementById('popover');
+  buildPopoverContent(ds);
+  pop.style.display='block';
+  pop.style.top='40%';pop.style.left='50%';pop.style.transform='translateX(-50%)';
+  pop.classList.remove('above','below');
+  document.getElementById('popover-backdrop').style.display='block';
+}
+function buildPopoverContent(ds){
+  const d=new Date(ds);
+  const dow=['日','月','火','水','木','金','土'][d.getDay()];
+  document.getElementById('popover-date').textContent=`${d.getMonth()+1}月${d.getDate()}日(${dow})`;
+  const items=[];
+  S.shifts.filter(s=>s.date===ds).forEach(s=>{const t=SHIFT_TY[s.type];items.push({color:t.color,name:getSN(s)||s.place||t.label,time:`${s.start}〜${s.end}`,onclick:`openShiftDet('${s.id}');closePopover()`});});
+  S.schedules.filter(s=>s.date===ds).forEach(s=>{const c=SCH_TY[s.type]?.color||'#888';items.push({color:c,name:s.title,time:`${s.start}〜${s.end}`,onclick:`openSchDet('${s.id}');closePopover()`});});
+  S.workouts.filter(w=>w.date===ds).forEach(w=>{const m=MUSCLES[w.muscle];items.push({color:m?.color||'#888',name:'💪 '+(m?.label||w.muscle),time:'',onclick:`openWkDet('${w.id}');closePopover()`});});
+  if(items.length===0){closePopover();onSchDay(ds);return;}
+  // + 新規追加ボタン
+  items.push({color:'var(--text3)',name:'+ 予定を追加',time:'',onclick:`closePopover();onSchDay('${ds}')`});
+  document.getElementById('popover-items').innerHTML=items.map(it=>`
+    <div class="popover-item" onclick="${it.onclick}">
+      <div class="popover-dot" style="background:${it.color}"></div>
+      <div style="flex:1"><div class="popover-name">${it.name}</div>${it.time?`<div class="popover-time">${it.time}</div>`:''}</div>
+      <i class="ti ti-chevron-right" style="color:var(--text3);font-size:14px"></i>
+    </div>`).join('');
+}
+
 function showPopover(e, ds){
   e.stopPropagation();
   const pop=document.getElementById('popover');
   const backdrop=document.getElementById('popover-backdrop');
-  const d=new Date(ds);
-  const dow=['日','月','火','水','木','金','土'][d.getDay()];
-  document.getElementById('popover-date').textContent=`${d.getMonth()+1}月${d.getDate()}日(${dow})`;
-
-  // その日の全イベント収集
-  const items=[];
-  S.shifts.filter(s=>s.date===ds).forEach(s=>{
-    const t=SHIFT_TY[s.type];
-    items.push({color:t.color,name:getSN(s)||s.place||t.label,time:`${s.start}〜${s.end}`,onclick:`openShiftDet('${s.id}');closePopover()`});
-  });
-  S.schedules.filter(s=>s.date===ds).forEach(s=>{
-    const c=SCH_TY[s.type]?.color||'#888';
-    items.push({color:c,name:s.title,time:`${s.start}〜${s.end}`,onclick:`openSchDet('${s.id}');closePopover()`});
-  });
-  S.workouts.filter(w=>w.date===ds).forEach(w=>{
-    const m=MUSCLES[w.muscle];
-    items.push({color:m?.color||'#888',name:'💪 '+(m?.label||w.muscle),time:'',onclick:`openWkDet('${w.id}');closePopover()`});
-  });
-
-  if(items.length===0){closePopover();return;}
-
-  document.getElementById('popover-items').innerHTML=items.map(it=>`
-    <div class="popover-item" onclick="${it.onclick}">
-      <div class="popover-dot" style="background:${it.color}"></div>
-      <div style="flex:1">
-        <div class="popover-name">${it.name}</div>
-        ${it.time?`<div class="popover-time">${it.time}</div>`:''}
-      </div>
-      <i class="ti ti-chevron-right" style="color:var(--text3);font-size:14px"></i>
-    </div>`).join('');
+  buildPopoverContent(ds);
+  if(document.getElementById('popover').style.display==='none')return;
 
   // 位置計算
   pop.style.display='block';
