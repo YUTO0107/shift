@@ -1097,7 +1097,9 @@ function openNewShift(ds){
   g('f-date').value=ds||''; g('f-place').value=''; g('f-start').value='09:00'; g('f-end').value='17:00';
   g('f-amount').value=''; g('f-transport').value=''; g('f-paydate').value=''; g('f-memo').value='';
   renderShiftTypeChips(); updMoneySection();
-  g('shift-ov-footer').innerHTML='<button class="btn btn-s" onclick="closeOv(\'shift-ov\')">キャンセル</button><button class="btn btn-p" onclick="saveShift()">登録</button>';
+  var f1=g('shift-ov-footer'); f1.innerHTML='';
+  var b1=document.createElement('button'); b1.className='btn btn-s'; b1.textContent='キャンセル'; b1.addEventListener('click',function(){closeOv('shift-ov');}); f1.appendChild(b1);
+  var b2=document.createElement('button'); b2.className='btn btn-p'; b2.textContent='登録'; b2.addEventListener('click',saveShift); f1.appendChild(b2);
   g('shift-ov').classList.add('show');
 }
 function openEditShift(id){
@@ -1107,7 +1109,9 @@ function openEditShift(id){
   g('f-date').value=s.date; g('f-place').value=s.place||''; g('f-start').value=s.start||'09:00'; g('f-end').value=s.end||'17:00';
   g('f-amount').value=s.amount||''; g('f-transport').value=s.transport||''; g('f-paydate').value=s.paymentDate||''; g('f-memo').value=s.memo||'';
   renderShiftTypeChips(); updMoneySection();
-  g('shift-ov-footer').innerHTML='<button class="btn btn-d" onclick="delShift(\''+id+'\');closeOv(\'shift-ov\');closeOv(\'det-ov\')">削除</button><button class="btn btn-p" onclick="saveShift()">保存</button>';
+  var f2=g('shift-ov-footer'); f2.innerHTML='';
+  var bd=document.createElement('button'); bd.className='btn btn-d'; bd.textContent='削除'; bd.addEventListener('click',function(){delShift(id);closeOv('shift-ov');closeOv('det-ov');}); f2.appendChild(bd);
+  var bs=document.createElement('button'); bs.className='btn btn-p'; bs.textContent='保存'; bs.addEventListener('click',saveShift); f2.appendChild(bs);
   closeOv('det-ov'); g('shift-ov').classList.add('show');
 }
 function renderShiftTypeChips(){
@@ -1346,7 +1350,9 @@ function openNewSch(ds){
   g('sch-ov-title').textContent='予定を追加';
   g('sc-title').value=''; g('sc-date').value=ds||''; g('sc-start').value='09:00'; g('sc-end').value='10:00'; g('sc-memo').value='';
   renderSchTypeChips();
-  g('sch-ov-footer').innerHTML='<button class="btn btn-s" onclick="closeOv(\'sch-ov\')">キャンセル</button><button class="btn btn-p" onclick="saveSch()">登録</button>';
+  var f3=g('sch-ov-footer'); f3.innerHTML='';
+  var b3=document.createElement('button'); b3.className='btn btn-s'; b3.textContent='キャンセル'; b3.addEventListener('click',function(){closeOv('sch-ov');}); f3.appendChild(b3);
+  var b4=document.createElement('button'); b4.className='btn btn-p'; b4.textContent='登録'; b4.addEventListener('click',saveSch); f3.appendChild(b4);
   g('sch-ov').classList.add('show');
 }
 function openEditSch(id){
@@ -1355,7 +1361,9 @@ function openEditSch(id){
   g('sch-ov-title').textContent='予定を編集';
   g('sc-title').value=s.name; g('sc-date').value=s.date; g('sc-start').value=s.start; g('sc-end').value=s.end; g('sc-memo').value=s.memo||'';
   renderSchTypeChips();
-  g('sch-ov-footer').innerHTML='<button class="btn btn-d" onclick="delSch(\''+id+'\');closeOv(\'sch-ov\');closeOv(\'det-ov\')">削除</button><button class="btn btn-p" onclick="saveSch()">保存</button>';
+  var f4=g('sch-ov-footer'); f4.innerHTML='';
+  var b5=document.createElement('button'); b5.className='btn btn-d'; b5.textContent='削除'; b5.addEventListener('click',function(){delSch(id);closeOv('sch-ov');closeOv('det-ov');}); f4.appendChild(b5);
+  var b6=document.createElement('button'); b6.className='btn btn-p'; b6.textContent='保存'; b6.addEventListener('click',saveSch); f4.appendChild(b6);
   closeOv('det-ov'); g('sch-ov').classList.add('show');
 }
 function renderSchTypeChips(){
@@ -1850,19 +1858,15 @@ function renderWkStampList(){
     ac.appendChild(eb); ac.appendChild(db);
     el.appendChild(row);
   });
-  // 追加ボタン
+  // 追加ボタン（sisの中に直接）
   var addDiv=document.createElement('div');
   addDiv.style.padding='12px 16px';
   var addBtn=document.createElement('button');
   addBtn.className='btn btn-p'; addBtn.style.fontSize='13px'; addBtn.textContent='+ 部位を追加';
   addBtn.addEventListener('click', openAddMuscle);
   addDiv.appendChild(addBtn);
-  el.parentElement.appendChild(addDiv);
+  el.appendChild(addDiv);
 }
-function openEditMuscle(key){
-  // 将来の拡張用（現在はラベル編集のみ）
-}
-
 // ===== 筋トレ部位管理 =====
 var MUSCLE_COLORS = ['#ef4444','#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899','#f97316','#06b6d4','#84cc16','#6b7280'];
 var editingMuscleKey = null;
@@ -1946,7 +1950,9 @@ load();
 loadMuscleSettings();
 loadTheme();
 renderHome();
-renderAllCals();
+renderCal('sh');
+renderCal('sch');
+renderCal('wk');
 renderShStamps();
 renderSchStamps();
 renderWkStamps();
