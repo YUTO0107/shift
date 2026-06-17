@@ -490,7 +490,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
     <div id="set-workout" style="display:none">
       <p class="stl">筋トレ部位スタンプ</p>
       <div class="sis" id="wk-stamp-list"></div>
-      <p style="font-size:12px;color:var(--text3);margin-top:8px">※部位の追加・削除は今後対応予定</p>
+      
     </div>
     <!-- 勤務タブ -->
     <div id="set-shift" style="display:none">
@@ -1475,32 +1475,53 @@ function openWkDet(id){
   g('det-body').innerHTML=html;
   g('det-ov').classList.add('show');
 }
+function getMuscleStatus(days){
+  if(days===null) return {emoji:'⚪',label:'記録なし',bg:'#f3f4f6',textColor:'#6b7280'};
+  if(days<=3)  return {emoji:'🔵',label:'最近やった',bg:'#dbeafe',textColor:'#1d4ed8'};
+  if(days<=7)  return {emoji:'🟢',label:'いい感じ',bg:'#d1fae5',textColor:'#065f46'};
+  if(days<=10) return {emoji:'🟡',label:'そろそろ',bg:'#fef3c7',textColor:'#92400e'};
+  if(days<=14) return {emoji:'🟠',label:'空いてる',bg:'#ffedd5',textColor:'#9a3412'};
+  return       {emoji:'🔴',label:'空きすぎ！',bg:'#fee2e2',textColor:'#991b1b'};
+}
 function renderMuscleCards(){
   var today=new Date(); today.setHours(0,0,0,0);
-  var html='';
+  var el=g('wk-muscle-cards'); if(!el) return;
+  el.innerHTML='';
   MUSCLE_KEYS.forEach(function(k){
     var m=MUSCLES[k];
     var recs=D.workouts.filter(function(w){return w.muscle===k;}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});
     var last=recs[0];
-    var days=null, status='ready', statusLabel='';
+    var days=null, lastDateStr='';
     if(last){
       var ld=new Date(last.date); ld.setHours(0,0,0,0);
       days=Math.floor((today-ld)/(1000*60*60*24));
-      if(days<m.rest){status='warn';statusLabel='⚠️ あと'+(m.rest-days)+'日';}
-      else if(days===m.rest){status='ok';statusLabel='✅ トレ日！';}
-      else{status='ready';statusLabel='🔥 いつでもOK';}
+      var ld2=new Date(last.date);
+      lastDateStr=(ld2.getMonth()+1)+'/'+ld2.getDate()+'('+['日','月','火','水','木','金','土'][ld2.getDay()]+')';
     }
-    html+='<div class="muscle-card" style="border-left-color:'+m.color+'" onclick="selWkMuscle(\''+k+'\')">'
-      +'<div class="mc-name" style="color:'+m.color+'">'+m.label+'</div>'
-      +'<div style="display:flex;align-items:baseline;gap:4px;margin:6px 0">'
-      +'<div class="mc-days" style="color:'+m.color+'">'+(days!==null?days:'--')+'</div>'
-      +'<div class="mc-unit">'+(days!==null?'日前':'')+'</div>'
+    var st=getMuscleStatus(days);
+    var card=document.createElement('div');
+    card.className='muscle-card';
+    card.style.borderLeftColor=m.color;
+    card.innerHTML=
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+        +'<div class="mc-name" style="color:'+m.color+'">'+m.label+'</div>'
+        +'<span style="font-size:18px">'+st.emoji+'</span>'
       +'</div>'
-      +''
-      +(statusLabel?'<span class="mc-status st-'+status+'">'+statusLabel+'</span>':'')
+      +'<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px">'
+        +(days!==null
+          ?'<span style="font-size:32px;font-weight:700;color:'+m.color+';line-height:1">'+days+'</span>'
+           +'<span style="font-size:13px;color:var(--text2)"> 日前</span>'
+          :'<span style="font-size:28px;font-weight:700;color:var(--text3)">--</span>')
+      +'</div>'
+      +'<div style="font-size:11px;color:var(--text2);margin-bottom:8px;min-height:16px">'
+        +(lastDateStr?'前回 '+lastDateStr:'まだ記録なし')
+      +'</div>'
+      +'<div style="display:inline-block;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;background:'+st.bg+';color:'+st.textColor+'">'
+        +st.label
       +'</div>';
+    card.addEventListener('click',function(){ selWkMuscle(k); });
+    el.appendChild(card);
   });
-  var el=g('wk-muscle-cards'); if(el) el.innerHTML=html;
 }
 function updWkCount(){
   var c=CAL.wk, ym=calToYM(c);
@@ -1550,27 +1571,20 @@ function renderHome(){
   var bn=baite.reduce(function(a,s){return a+baiteTakeHome(+s.amount||0);},0);
   g('home-salary').innerHTML='<div class="sc hl"><div class="lbl">今月 総額面</div><div class="val">¥'+fmt(fg+bg)+'</div><div class="sub">常勤+バイト</div></div>'
     +'<div class="sc gn"><div class="lbl">今月 総手取り</div><div class="val">¥'+fmt(fn+bn)+'</div><div class="sub">概算</div></div>';
-  // 筋トレ
+  // 筋トレ（ホーム）
   var todayD=new Date(); todayD.setHours(0,0,0,0);
   var mHtml='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">';
   MUSCLE_KEYS.forEach(function(k){
     var m=MUSCLES[k];
     var recs=D.workouts.filter(function(w){return w.muscle===k;}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});
     var last=recs[0];
-    var days=null, dotColor='var(--text3)', emoji='';
-    if(last){
-      var ld=new Date(last.date);ld.setHours(0,0,0,0);
-      days=Math.floor((todayD-ld)/(1000*60*60*24));
-      if(days<=3){dotColor='#1d6fa4';emoji='🔵';}
-      else if(days<=7){dotColor='#2d7a2d';emoji='🟢';}
-      else if(days<=10){dotColor='#a07800';emoji='🟡';}
-      else if(days<=14){dotColor='#c05800';emoji='🟠';}
-      else{dotColor='#c0202a';emoji='🔴';}
-    }
+    var days=null;
+    if(last){var ld=new Date(last.date);ld.setHours(0,0,0,0);days=Math.floor((todayD-ld)/(1000*60*60*24));}
+    var st=getMuscleStatus(days);
     mHtml+='<div style="text-align:center;padding:8px 4px;background:var(--bg3);border-radius:var(--radius-sm)">'
-      +'<div style="font-size:14px;margin-bottom:2px">'+(emoji||'⚪')+'</div>'
-      +'<div style="font-size:10px;font-weight:600;color:var(--text2)">'+m.label+'</div>'
-      +'<div style="font-size:13px;font-weight:700;color:'+dotColor+'">'+(days!==null?days:'--')+'<span style="font-size:9px;color:var(--text3)">日</span></div>'
+      +'<div style="font-size:16px;line-height:1;margin-bottom:3px">'+st.emoji+'</div>'
+      +'<div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:2px">'+m.label+'</div>'
+      +'<div style="font-size:13px;font-weight:700;color:'+m.color+'">'+(days!==null?days:'--')+'<span style="font-size:9px;color:var(--text2)">日</span></div>'
       +'</div>';
   });
   mHtml+='</div>';
@@ -1820,35 +1834,116 @@ function renderWkStampList(){
   var el=g('wk-stamp-list'); if(!el) return;
   el.innerHTML='';
   MUSCLE_KEYS.forEach(function(k){
-    var m=MUSCLES[k];
+    var m=MUSCLES[k]; if(!m) return;
     var row=document.createElement('div');
     row.className='sli';
     row.innerHTML='<div class="dot" style="background:'+m.color+'"></div>'
-      +'<div class="sli-in"><div class="sli-nm">'+m.label+'</div>'
-      +'<div class="sli-dt">推奨インターバル '+m.rest+'日</div></div>'
+      +'<div class="sli-in"><div class="sli-nm">'+m.label+'</div></div>'
       +'<div class="sli-ac"></div>';
     var ac=row.querySelector('.sli-ac');
     var eb=document.createElement('button');
     eb.className='ebt'; eb.innerHTML='<i class="ti ti-edit"></i>';
     eb.addEventListener('click',function(){ openEditMuscle(k); });
-    ac.appendChild(eb);
+    var db=document.createElement('button');
+    db.className='dbt'; db.innerHTML='<i class="ti ti-trash"></i>';
+    db.addEventListener('click',function(){ delMuscle(k); });
+    ac.appendChild(eb); ac.appendChild(db);
     el.appendChild(row);
   });
+  // 追加ボタン
+  var addDiv=document.createElement('div');
+  addDiv.style.padding='12px 16px';
+  var addBtn=document.createElement('button');
+  addBtn.className='btn btn-p'; addBtn.style.fontSize='13px'; addBtn.textContent='+ 部位を追加';
+  addBtn.addEventListener('click', openAddMuscle);
+  addDiv.appendChild(addBtn);
+  el.parentElement.appendChild(addDiv);
+}
+function openEditMuscle(key){
+  // 将来の拡張用（現在はラベル編集のみ）
+}
+
+// ===== 筋トレ部位管理 =====
+var MUSCLE_COLORS = ['#ef4444','#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899','#f97316','#06b6d4','#84cc16','#6b7280'];
+var editingMuscleKey = null;
+var selectedMuscleColor = '#ef4444';
+
+function openAddMuscle(){
+  editingMuscleKey=null;
+  selectedMuscleColor='#ef4444';
+  g('muscle-ov-title').textContent='部位を追加';
+  g('mu-name').value='';
+  renderMuscleColors();
+  g('muscle-ov').classList.add('show');
 }
 function openEditMuscle(key){
   var m=MUSCLES[key]; if(!m) return;
-  var newRest=prompt(m.label+'の推奨インターバル（日数）を入力してください', m.rest);
-  if(newRest===null) return;
-  var n=parseInt(newRest);
-  if(isNaN(n)||n<1){alert('1以上の数値を入力してください');return;}
-  MUSCLES[key].rest=n;
-  // カスタム設定を保存
-  if(!D.settings.muscleRest) D.settings.muscleRest={};
-  D.settings.muscleRest[key]=n;
-  save(); renderWkStampList(); renderMuscleCards();
+  editingMuscleKey=key;
+  selectedMuscleColor=m.color;
+  g('muscle-ov-title').textContent='部位を編集';
+  g('mu-name').value=m.label;
+  renderMuscleColors();
+  g('muscle-ov').classList.add('show');
+}
+function renderMuscleColors(){
+  var el=g('mu-colors'); if(!el) return;
+  el.innerHTML='';
+  MUSCLE_COLORS.forEach(function(c){
+    var div=document.createElement('div');
+    div.style.cssText='width:32px;height:32px;border-radius:50%;background:'+c+';cursor:pointer;border:3px solid '+(selectedMuscleColor===c?'var(--text)':'transparent');
+    div.addEventListener('click',function(){ selectedMuscleColor=c; renderMuscleColors(); });
+    el.appendChild(div);
+  });
+}
+function saveMuscle(){
+  var nm=g('mu-name').value.trim();
+  if(!nm){alert('部位名を入力してください');return;}
+  if(editingMuscleKey){
+    // 編集
+    MUSCLES[editingMuscleKey].label=nm;
+    MUSCLES[editingMuscleKey].color=selectedMuscleColor;
+  } else {
+    // 追加
+    var key='mu'+Date.now();
+    MUSCLES[key]={label:nm,color:selectedMuscleColor};
+    MUSCLE_KEYS.push(key);
+  }
+  // カスタム部位を保存
+  saveMuscleSettings();
+  closeOv('muscle-ov');
+  renderWkStampList();
+  renderWkStamps();
+  renderMuscleCards();
+  updWkCount();
+}
+function delMuscle(key){
+  if(!confirm('「'+MUSCLES[key].label+'」を削除しますか？
+記録データは残ります。')) return;
+  delete MUSCLES[key];
+  MUSCLE_KEYS.splice(MUSCLE_KEYS.indexOf(key),1);
+  saveMuscleSettings();
+  renderWkStampList();
+  renderWkStamps();
+  renderMuscleCards();
+  updWkCount();
+}
+function saveMuscleSettings(){
+  D.settings.customMuscles={keys:MUSCLE_KEYS,data:{}};
+  MUSCLE_KEYS.forEach(function(k){ D.settings.customMuscles.data[k]=MUSCLES[k]; });
+  save();
+}
+function loadMuscleSettings(){
+  if(D.settings.customMuscles&&D.settings.customMuscles.keys){
+    MUSCLE_KEYS.length=0;
+    D.settings.customMuscles.keys.forEach(function(k){ MUSCLE_KEYS.push(k); });
+    Object.keys(D.settings.customMuscles.data).forEach(function(k){
+      MUSCLES[k]=D.settings.customMuscles.data[k];
+    });
+  }
 }
 
 load();
+loadMuscleSettings();
 loadTheme();
 renderHome();
 renderAllCals();
@@ -1859,5 +1954,21 @@ renderMuscleCards();
 updShTotal();
 updWkCount();
 </script>
+<!-- 筋トレ部位 追加・編集 -->
+<div class="overlay" id="muscle-ov" onclick="closeOv('muscle-ov',event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3 id="muscle-ov-title">部位を追加</h3>
+    <div class="fr"><label>部位名</label><input type="text" id="mu-name" placeholder="例：胸・背中・脚"></div>
+    <div class="fr">
+      <label>カラー</label>
+      <div id="mu-colors" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-s" onclick="closeOv('muscle-ov')">キャンセル</button>
+      <button class="btn btn-p" onclick="saveMuscle()">保存</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
