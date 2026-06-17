@@ -20,9 +20,16 @@
   --orange:#f59e0b;--orange-bg:#fffbeb;
   --red:#ef4444;--red-bg:#fef2f2;--red-light:#fecaca;
   --purple:#8b5cf6;--purple-bg:#f5f3ff;--purple-light:#ede9fe;
+  --accent:#3b82f6;--accent-bg:#eff6ff;--accent-light:#dbeafe;
   --radius:10px;--radius-sm:6px;
   --nav-h:54px;
 }
+/* テーマ */
+[data-theme="blue"]{--accent:#3b82f6;--accent-bg:#eff6ff;--accent-light:#dbeafe;}
+[data-theme="green"]{--accent:#10b981;--accent-bg:#ecfdf5;--accent-light:#d1fae5;}
+[data-theme="purple"]{--accent:#8b5cf6;--accent-bg:#f5f3ff;--accent-light:#ede9fe;}
+[data-theme="gray"]{--accent:#6b7280;--accent-bg:#f9fafb;--accent-light:#f3f4f6;}
+[data-theme="dark"]{--bg:#0f1117;--bg2:#1a1d29;--bg3:#242736;--text:#f1f3f9;--text2:#9ca3af;--text3:#6b7280;--border:#2d3148;--border2:#3d4166;--accent:#3b82f6;--accent-bg:#1e2a4a;--accent-light:#1e3a5f;}
 @media(prefers-color-scheme:dark){
   :root{
     --bg:#0f1117;--bg2:#1a1d29;--bg3:#242736;
@@ -40,7 +47,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 /* ナビ */
 #nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:200;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
 .nb{flex:1;padding:8px 4px 6px;border:none;background:none;color:var(--text2);font-size:9px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
-.nb.active{color:var(--blue)}
+.nb.active{color:var(--accent)}
 .nb i{font-size:22px}
 
 /* ページ */
@@ -63,9 +70,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .cal-day.sun .day-num{color:var(--red)}
 .cal-day.sat .day-num{color:var(--blue)}
 .cal-day.om .day-num{color:var(--text3)!important}
-.cal-day.selected{background:var(--blue-bg)}
+.cal-day.selected{background:var(--accent-bg)}
 .day-num{font-size:12px;font-weight:500;margin-bottom:1px;width:22px;height:22px;display:flex;align-items:center;justify-content:center}
-.day-num.today{background:var(--blue);color:#fff!important;border-radius:50%}
+.day-num.today{background:var(--accent);color:#fff!important;border-radius:50%}
 .ev{border-radius:3px;padding:1px 3px;font-size:9px;font-weight:700;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .ev.full-time{background:#dbeafe;color:#1e40af}
 .ev.part-time{background:#d1fae5;color:#065f46}
@@ -96,7 +103,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 }
 
 /* スタンプパネル */
-.stamp-panel{background:var(--bg2);border-top:3px solid var(--blue);padding:8px 12px 6px;flex-shrink:0}
+.stamp-panel{background:var(--bg2);border-top:3px solid var(--accent);padding:8px 12px 6px;flex-shrink:0}
 .stamp-panel.green{border-top-color:var(--green)}
 .stamp-panel.purple{border-top-color:var(--purple)}
 .stamp-panel-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
@@ -131,7 +138,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .sc .lbl{font-size:11px;color:var(--text2);margin-bottom:4px}
 .sc .val{font-size:18px;font-weight:600}
 .sc .sub{font-size:11px;color:var(--text3);margin-top:2px}
-.sc.hl{background:var(--blue-bg);border-color:var(--blue-light)}.sc.hl .val{color:var(--blue)}
+.sc.hl{background:var(--accent-bg);border-color:var(--accent-light)}.sc.hl .val{color:var(--accent)}
 .sc.gn{background:var(--green-bg);border-color:var(--green-light)}.sc.gn .val{color:var(--green)}
 .sc.pu{background:var(--purple-bg);border-color:var(--purple-light)}.sc.pu .val{color:var(--purple)}
 .ic{background:var(--bg2);border-radius:var(--radius);padding:14px;border:1px solid var(--border);margin-bottom:12px}
@@ -211,7 +218,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .modal h3{font-size:16px;font-weight:600;margin-bottom:14px}
 .modal-footer{display:flex;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
 .btn{padding:12px 18px;border-radius:var(--radius-sm);border:none;font-size:15px;font-weight:600;cursor:pointer;flex:1}
-.btn-p{background:var(--blue);color:#fff}
+.btn-p{background:var(--accent);color:#fff}
 .btn-d{background:var(--red);color:#fff}
 .btn-s{background:var(--bg3);color:var(--text)}
 .fr{margin-bottom:12px}
@@ -254,6 +261,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .dli-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;padding:4px}
 .dirow{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
 .dirow:last-child{border-bottom:none}
+.set-tab{flex:1;padding:10px 4px;border:none;background:none;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent}
+.set-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .dil{font-size:12px;color:var(--text2)}
 .div2{font-size:13px;font-weight:500}
 .nb2{background:var(--blue-bg);border-radius:var(--radius-sm);padding:9px 12px;font-size:12px;color:var(--blue);margin-top:10px}
@@ -356,7 +365,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:7px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
     <div><div style="font-size:11px;color:var(--text2)">今月の給料合計</div><div style="font-size:10px;color:var(--text3)" id="sh-sub"></div></div>
     <div style="display:flex;align-items:center;gap:8px">
-      <button onclick="openBulk()" style="background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer"><i class="ti ti-calendar-plus" style="font-size:12px;margin-right:2px"></i>一括</button>
+      <button onclick="openBulk()" style="background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer"><i class="ti ti-calendar-plus" style="font-size:12px;margin-right:2px"></i>一括</button>
       <div style="font-size:18px;font-weight:700;color:var(--blue)" id="sh-total">¥0</div>
     </div>
   </div>
@@ -380,41 +389,74 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 <!-- 設定 -->
 <div class="page" id="page-settings">
   <div class="ph"><h2>設定</h2></div>
+  <!-- 設定タブ -->
+  <div style="display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0">
+    <button class="set-tab active" id="stab-schedule" onclick="showSetTab('schedule')">📅 予定</button>
+    <button class="set-tab" id="stab-workout" onclick="showSetTab('workout')">💪 筋トレ</button>
+    <button class="set-tab" id="stab-shift" onclick="showSetTab('shift')">🩺 勤務</button>
+    <button class="set-tab" id="stab-other" onclick="showSetTab('other')">⚙️ その他</button>
+  </div>
   <div class="ps" style="padding:14px">
-    <p class="stl">カレンダー設定</p>
-    <div class="sis">
-      <div class="ssi">
-        <div><div class="ssi-l">月曜始まり</div><div class="ssi-s">オフで日曜始まり</div></div>
-        <button class="toggle on" id="monday-toggle" onclick="toggleMonday()"></button>
+    <!-- 予定タブ -->
+    <div id="set-schedule">
+      <p class="stl">予定スタンプ</p>
+      <div class="sis">
+        <div id="sch-stamp-list"></div>
+        <div style="padding:12px 16px"><button class="btn btn-p" style="font-size:13px" onclick="openSchStampAdd()">+ 追加</button></div>
       </div>
     </div>
-    <p class="stl">常勤給与（年俸制）</p>
-    <div class="sis">
-      <div class="ssi"><div><div class="ssi-l">勤務先名</div></div><input type="text" id="s-ft-name" placeholder="○○病院" style="width:130px;text-align:left;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveFt()"></div>
-      <div class="ssi"><div><div class="ssi-l">年俸（税込）</div><div class="ssi-s">額面年収</div></div><div style="display:flex;align-items:center;gap:4px"><input type="number" id="s-ft-annual" placeholder="0" step="100000" style="width:110px;text-align:right;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveFt()"><span style="font-size:12px;color:var(--text2)">円</span></div></div>
-      <div class="ssi"><div><div class="ssi-l">月額手取り</div><div class="ssi-s">給与明細の振込額</div></div><div style="display:flex;align-items:center;gap:4px"><input type="number" id="s-ft-net" placeholder="0" step="10000" style="width:110px;text-align:right;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveFt()"><span style="font-size:12px;color:var(--text2)">円</span></div></div>
-      <div class="ssi"><div><div class="ssi-l">振込日</div></div><div style="display:flex;align-items:center;gap:4px"><input type="number" id="s-ft-payday" placeholder="25" min="1" max="31" style="width:60px;text-align:right;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveFt()"><span style="font-size:12px;color:var(--text2)">日払い</span></div></div>
-      <div class="ssi"><div><div class="ssi-l">賞与（年間手取り）</div></div><div style="display:flex;align-items:center;gap:4px"><input type="number" id="s-ft-bonus" placeholder="0" step="100000" style="width:110px;text-align:right;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveFt()"><span style="font-size:12px;color:var(--text2)">円</span></div></div>
-      <div style="padding:12px 16px" id="ft-preview"></div>
+    <!-- 筋トレタブ -->
+    <div id="set-workout" style="display:none">
+      <p class="stl">筋トレ部位スタンプ</p>
+      <div class="sis" id="wk-stamp-list"></div>
+      <p style="font-size:12px;color:var(--text3);margin-top:8px">※部位の追加・削除は今後対応予定</p>
     </div>
-    <p class="stl">バイト税率</p>
-    <div class="sis">
-      <div class="ssi"><div><div class="ssi-l">所得税率</div></div><div style="display:flex;align-items:center;gap:4px"><input type="number" id="s-itax" value="10" min="0" max="45" step="0.1" style="width:60px;text-align:right;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveSetting('incomeTax',this.value)"><span style="font-size:12px;color:var(--text2)">%</span></div></div>
-      <div class="ssi"><div><div class="ssi-l">住民税率</div></div><div style="display:flex;align-items:center;gap:4px"><input type="number" id="s-rtax" value="10" min="0" max="20" step="0.1" style="width:60px;text-align:right;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveSetting('residentTax',this.value)"><span style="font-size:12px;color:var(--text2)">%</span></div></div>
+    <!-- 勤務タブ -->
+    <div id="set-shift" style="display:none">
+      <p class="stl">勤務スタンプ</p>
+      <div class="sis">
+        <div id="stamp-list"></div>
+        <div style="padding:12px 16px"><button class="btn btn-p" style="font-size:13px" onclick="openStampAdd()">+ 追加</button></div>
+      </div>
+      <p class="stl">常勤給与（年俸制）</p>
+      <div class="sis">
+        <div class="ssi"><div><div class="ssi-l">勤務先名</div></div><input type="text" id="s-ft-name" placeholder="○○病院" style="width:130px;text-align:left;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveFt()"></div>
+        <div class="ssi"><div><div class="ssi-l">年俸（税込）</div><div class="ssi-s">額面年収</div></div><div style="display:flex;align-items:center;gap:4px"><input type="number" id="s-ft-annual" placeholder="0" step="100000" style="width:110px;text-align:right;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveFt()"><span style="font-size:12px;color:var(--text2)">円</span></div></div>
+        <div class="ssi"><div><div class="ssi-l">月額手取り</div><div class="ssi-s">給与明細の振込額</div></div><div style="display:flex;align-items:center;gap:4px"><input type="number" id="s-ft-net" placeholder="0" step="10000" style="width:110px;text-align:right;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveFt()"><span style="font-size:12px;color:var(--text2)">円</span></div></div>
+        <div class="ssi"><div><div class="ssi-l">振込日</div></div><div style="display:flex;align-items:center;gap:4px"><input type="number" id="s-ft-payday" placeholder="25" min="1" max="31" style="width:60px;text-align:right;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveFt()"><span style="font-size:12px;color:var(--text2)">日払い</span></div></div>
+        <div class="ssi"><div><div class="ssi-l">賞与（年間手取り）</div></div><div style="display:flex;align-items:center;gap:4px"><input type="number" id="s-ft-bonus" placeholder="0" step="100000" style="width:110px;text-align:right;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveFt()"><span style="font-size:12px;color:var(--text2)">円</span></div></div>
+        <div style="padding:12px 16px" id="ft-preview"></div>
+      </div>
+      <p class="stl">バイト税率</p>
+      <div class="sis">
+        <div class="ssi"><div><div class="ssi-l">所得税率</div></div><div style="display:flex;align-items:center;gap:4px"><input type="number" id="s-itax" value="10" min="0" max="45" step="0.1" style="width:60px;text-align:right;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveSetting('incomeTax',this.value)"><span style="font-size:12px;color:var(--text2)">%</span></div></div>
+        <div class="ssi"><div><div class="ssi-l">住民税率</div></div><div style="display:flex;align-items:center;gap:4px"><input type="number" id="s-rtax" value="10" min="0" max="20" step="0.1" style="width:60px;text-align:right;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:14px" onchange="saveSetting('residentTax',this.value)"><span style="font-size:12px;color:var(--text2)">%</span></div></div>
+      </div>
+      <p class="stl">今月の収入</p>
+      <div class="ic" id="income-card"></div>
     </div>
-    <p class="stl">勤務スタンプ</p>
-    <div class="sis">
-      <div id="stamp-list"></div>
-      <div style="padding:12px 16px"><button class="btn btn-p" style="font-size:13px" onclick="openStampAdd()">+ 追加</button></div>
-    </div>
-    <p class="stl">今月の収入</p>
-    <div class="ic" id="income-card"></div>
-    <p class="stl">データ管理</p>
-    <div class="sis">
-      <div class="ssi" onclick="exportCSV()" style="cursor:pointer"><div class="ssi-l"><i class="ti ti-download" style="margin-right:6px"></i>CSVエクスポート</div><i class="ti ti-chevron-right" style="color:var(--text3)"></i></div>
-      <div class="ssi" onclick="document.getElementById('csv-in').click()" style="cursor:pointer"><div class="ssi-l"><i class="ti ti-upload" style="margin-right:6px"></i>CSVインポート</div><i class="ti ti-chevron-right" style="color:var(--text3)"></i></div>
-      <input type="file" id="csv-in" accept=".csv" style="display:none" onchange="importCSV(this)">
-      <div class="ssi" onclick="clearAll()" style="cursor:pointer"><div class="ssi-l" style="color:var(--red)"><i class="ti ti-trash" style="margin-right:6px"></i>全データ削除</div><i class="ti ti-chevron-right" style="color:var(--text3)"></i></div>
+    <!-- その他タブ -->
+    <div id="set-other" style="display:none">
+      <p class="stl">テーマ</p>
+      <div class="sis">
+        <div class="ssi" style="flex-wrap:wrap;gap:10px">
+          <div id="theme-btns" style="display:flex;gap:8px;flex-wrap:wrap;width:100%;padding:4px 0"></div>
+        </div>
+      </div>
+      <p class="stl">カレンダー設定</p>
+      <div class="sis">
+        <div class="ssi">
+          <div><div class="ssi-l">月曜始まり</div><div class="ssi-s">オフで日曜始まり</div></div>
+          <button class="toggle on" id="monday-toggle" onclick="toggleMonday()"></button>
+        </div>
+      </div>
+      <p class="stl">データ管理</p>
+      <div class="sis">
+        <div class="ssi" onclick="exportCSV()" style="cursor:pointer"><div class="ssi-l"><i class="ti ti-download" style="margin-right:6px"></i>CSVエクスポート</div><i class="ti ti-chevron-right" style="color:var(--text3)"></i></div>
+        <div class="ssi" onclick="document.getElementById('csv-in').click()" style="cursor:pointer"><div class="ssi-l"><i class="ti ti-upload" style="margin-right:6px"></i>CSVインポート</div><i class="ti ti-chevron-right" style="color:var(--text3)"></i></div>
+        <input type="file" id="csv-in" accept=".csv" style="display:none" onchange="importCSV(this)">
+        <div class="ssi" onclick="clearAll()" style="cursor:pointer"><div class="ssi-l" style="color:var(--red)"><i class="ti ti-trash" style="margin-right:6px"></i>全データ削除</div><i class="ti ti-chevron-right" style="color:var(--text3)"></i></div>
+      </div>
     </div>
   </div>
 </div>
@@ -604,6 +646,7 @@ var activeWkMuscle = null;
 var activeSchStamp = null;
 var multiDates = [];
 var editingStampId = null;
+var editingSchStampId = null;
 var editingShiftId = null;
 var editingSchId = null;
 var editStampType = 'full-time';
@@ -706,7 +749,7 @@ function showPage(p){
   else if(p==='schedule') { renderCal('sch'); renderSchStamps(); }
   else if(p==='workout') { renderCal('wk'); renderWkStamps(); renderMuscleCards(); updWkCount(); }
   else if(p==='shift') { renderCal('sh'); renderShStamps(); }
-  else if(p==='settings') { loadSettingsUI(); renderStampList(); renderIncomeCard(); }
+  else if(p==='settings') { loadSettingsUI(); showSetTab('schedule'); }
 }
 
 // ===== カレンダー =====
@@ -1150,8 +1193,11 @@ function renderSchStampChips(){
 }
 function saveSchStamp(){
   var nm=g('ss-name').value.trim(); if(!nm){alert('名前を入力してください');return;}
-  D.schStamps.push({id:'ss'+Date.now(),name:nm,type:editSchStampType,start:g('ss-start').value,end:g('ss-end').value});
-  save(); closeOv('sch-stamp-ov'); renderSchStamps();
+  var st={id:editingSchStampId||('ss'+Date.now()),name:nm,type:editSchStampType,start:g('ss-start').value,end:g('ss-end').value};
+  if(editingSchStampId){var i=D.schStamps.findIndex(function(s){return s.id===editingSchStampId;});if(i>=0)D.schStamps[i]=st;}
+  else D.schStamps.push(st);
+  editingSchStampId=null;
+  save(); closeOv('sch-stamp-ov'); renderSchStamps(); renderSchStampList();
 }
 function openSchPop(ds){
   // 予定タブの吹き出し
@@ -1590,7 +1636,140 @@ function closeDayOv(e){closeOv('day-ov',e);}
 })();
 
 // ===== 起動 =====
+// ===== 設定タブ =====
+function showSetTab(tab){
+  ['schedule','workout','shift','other'].forEach(function(t){
+    g('set-'+t).style.display = t===tab?'block':'none';
+    g('stab-'+t).classList.toggle('active', t===tab);
+  });
+  if(tab==='schedule') renderSchStampList();
+  if(tab==='workout') renderWkStampList();
+  if(tab==='shift'){ renderStampList(); renderIncomeCard(); loadSettingsUI(); }
+  if(tab==='other') renderThemeBtns();
+}
+
+// ===== テーマ =====
+var THEMES = [
+  {id:'blue',  label:'Blue',   accent:'#3b82f6', bg:'#eff6ff', light:'#dbeafe'},
+  {id:'green', label:'Green',  accent:'#10b981', bg:'#ecfdf5', light:'#d1fae5'},
+  {id:'purple',label:'Purple', accent:'#8b5cf6', bg:'#f5f3ff', light:'#ede9fe'},
+  {id:'gray',  label:'Gray',   accent:'#6b7280', bg:'#f9fafb', light:'#f3f4f6'},
+  {id:'dark',  label:'Dark',   accent:'#3b82f6', bg:'#1e2a4a', light:'#1e3a5f'}
+];
+function renderThemeBtns(){
+  var el=g('theme-btns'); if(!el) return;
+  el.innerHTML='';
+  var cur=D.settings.theme||'blue';
+  THEMES.forEach(function(th){
+    var btn=document.createElement('button');
+    btn.style.cssText='padding:8px 16px;border-radius:20px;border:2px solid '+(cur===th.id?th.accent:'var(--border2)')+';background:'+(cur===th.id?th.accent+'22':'var(--bg3)')+';color:'+(cur===th.id?th.accent:'var(--text2)')+';font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px';
+    btn.innerHTML='<div style="width:12px;height:12px;border-radius:50%;background:'+th.accent+'"></div>'+th.label;
+    btn.addEventListener('click',function(){ applyTheme(th.id); renderThemeBtns(); });
+    el.appendChild(btn);
+  });
+}
+function applyTheme(themeId){
+  D.settings.theme=themeId;
+  save();
+  if(themeId==='dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+  } else {
+    document.documentElement.setAttribute('data-theme',themeId);
+    // ダークモードを解除するためstyleを上書き
+    var th=THEMES.filter(function(t){return t.id===themeId;})[0];
+    if(th){
+      document.documentElement.style.setProperty('--accent',th.accent);
+      document.documentElement.style.setProperty('--accent-bg',th.bg);
+      document.documentElement.style.setProperty('--accent-light',th.light);
+    }
+  }
+}
+function loadTheme(){
+  var themeId=D.settings.theme||'blue';
+  applyTheme(themeId);
+}
+
+// ===== 予定スタンプ管理 =====
+function renderSchStampList(){
+  var el=g('sch-stamp-list'); if(!el) return;
+  el.innerHTML='';
+  var colors={'work':'#3b82f6','private':'#10b981','other':'#8b5cf6'};
+  D.schStamps.forEach(function(st){
+    var c=colors[st.type]||'#888';
+    var row=document.createElement('div');
+    row.className='sli';
+    row.innerHTML='<div class="dot" style="background:'+c+'"></div>'
+      +'<div class="sli-in"><div class="sli-nm">'+st.name+'</div>'
+      +'<div class="sli-dt">'+(st.type==='work'?'仕事':st.type==='private'?'プライベート':'その他')+' '+st.start+'〜'+st.end+'</div></div>'
+      +'<div class="sli-ac"></div>';
+    var ac=row.querySelector('.sli-ac');
+    var eb=document.createElement('button');
+    eb.className='ebt'; eb.innerHTML='<i class="ti ti-edit"></i>';
+    eb.addEventListener('click',function(){ openEditSchStamp(st.id); });
+    var db=document.createElement('button');
+    db.className='dbt'; db.innerHTML='<i class="ti ti-trash"></i>';
+    db.addEventListener('click',function(){ delSchStamp(st.id); });
+    ac.appendChild(eb); ac.appendChild(db);
+    el.appendChild(row);
+  });
+  if(D.schStamps.length===0) el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:12px 16px">スタンプなし</div>';
+  // 追加ボタン
+  var addDiv=document.createElement('div');
+  addDiv.style.padding='12px 16px';
+  var addBtn=document.createElement('button');
+  addBtn.className='btn btn-p'; addBtn.style.fontSize='13px'; addBtn.textContent='+ 追加';
+  addBtn.addEventListener('click', openSchStampAdd);
+  addDiv.appendChild(addBtn);
+  el.parentElement.appendChild(addDiv);
+}
+function openEditSchStamp(id){
+  var st=D.schStamps.filter(function(s){return s.id===id;})[0]; if(!st) return;
+  editingSchStampId=id; editSchStampType=st.type;
+  g('ss-name').value=st.name; g('ss-start').value=st.start; g('ss-end').value=st.end;
+  renderSchStampChips();
+  g('sch-stamp-ov').classList.add('show');
+}
+function delSchStamp(id){
+  if(!confirm('削除しますか？')) return;
+  D.schStamps=D.schStamps.filter(function(s){return s.id!==id;});
+  save(); renderSchStampList(); renderSchStamps();
+}
+
+// ===== 筋トレスタンプ管理 =====
+function renderWkStampList(){
+  var el=g('wk-stamp-list'); if(!el) return;
+  el.innerHTML='';
+  MUSCLE_KEYS.forEach(function(k){
+    var m=MUSCLES[k];
+    var row=document.createElement('div');
+    row.className='sli';
+    row.innerHTML='<div class="dot" style="background:'+m.color+'"></div>'
+      +'<div class="sli-in"><div class="sli-nm">'+m.label+'</div>'
+      +'<div class="sli-dt">推奨インターバル '+m.rest+'日</div></div>'
+      +'<div class="sli-ac"></div>';
+    var ac=row.querySelector('.sli-ac');
+    var eb=document.createElement('button');
+    eb.className='ebt'; eb.innerHTML='<i class="ti ti-edit"></i>';
+    eb.addEventListener('click',function(){ openEditMuscle(k); });
+    ac.appendChild(eb);
+    el.appendChild(row);
+  });
+}
+function openEditMuscle(key){
+  var m=MUSCLES[key]; if(!m) return;
+  var newRest=prompt(m.label+'の推奨インターバル（日数）を入力してください', m.rest);
+  if(newRest===null) return;
+  var n=parseInt(newRest);
+  if(isNaN(n)||n<1){alert('1以上の数値を入力してください');return;}
+  MUSCLES[key].rest=n;
+  // カスタム設定を保存
+  if(!D.settings.muscleRest) D.settings.muscleRest={};
+  D.settings.muscleRest[key]=n;
+  save(); renderWkStampList(); renderMuscleCards();
+}
+
 load();
+loadTheme();
 renderHome();
 renderAllCals();
 renderShStamps();
