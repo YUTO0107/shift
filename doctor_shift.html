@@ -562,6 +562,7 @@ var MUSCLES = {
   'back':{label:'背中',color:'#3b82f6',rest:2},
   'legs':{label:'脚',color:'#10b981',rest:3},
   'shoulder':{label:'肩',color:'#f59e0b',rest:2},
+  'arms':{label:'腕',color:'#8b5cf6',rest:2},
   'arms':{label:'腕',color:'#8b5cf6',rest:2}
 };
 var MUSCLE_KEYS = ['chest','back','legs','shoulder','arms'];
@@ -790,7 +791,7 @@ function getEventsForDay(mode, ds){
   } else if(mode==='wk'){
     D.workouts.filter(function(w){return w.date===ds;}).forEach(function(w){
       var m = MUSCLES[w.muscle];
-      evs.push({cls:w.muscle, label:(m?m.label:w.muscle), id:w.id, kind:'wk'});
+      evs.push({cls:w.muscle, label:(m?m.label:w.muscle), color:(m&&m.color)||'#888', name:'💪 '+(m?m.label:w.muscle), id:w.id, kind:'wk'});
     });
   } else if(mode==='sch'){
     // 勤務
@@ -905,7 +906,26 @@ function openShDayModal(ds){
       else if(act==='del'){delShift(sid);}
     });
   });
-  g('day-ov-grid').innerHTML='';
+  // スタンプグリッド
+  var gh='';
+  gh+='<p style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px">スタンプから追加</p>';
+  gh+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  D.stamps.forEach(function(st){
+    var t=SHIFT_TYPES[st.type]||SHIFT_TYPES['spot'];
+    gh+='<div data-stid="'+st.id+'" style="background:'+t.color+'22;color:'+t.color+';border-radius:var(--radius-sm);padding:8px 10px;cursor:pointer;font-weight:700;font-size:12px">'
+      +st.name+'<div style="font-size:10px;opacity:0.8">'+st.start+'〜'+st.end+(st.amount?'  ¥'+fmt(st.amount):'')+'</div></div>';
+  });
+  gh+='</div>';
+  g('day-ov-grid').innerHTML=gh;
+  g('day-ov-grid').querySelectorAll('[data-stid]').forEach(function(el){
+    el.addEventListener('click',function(){
+      var sid=el.getAttribute('data-stid');
+      var st=D.stamps.filter(function(s){return s.id===sid;})[0];
+      if(!st) return;
+      addShiftFromStamp(ds, st);
+      closeOv('day-ov');
+    });
+  });
   g('day-ov').classList.add('show');
 }
 
@@ -1145,8 +1165,10 @@ function openSchPop(ds){
     evs.push({color:c,name:s.name,time:s.start+'〜'+s.end,id:s.id,kind:'sch'});
   });
   D.workouts.filter(function(w){return w.date===ds;}).forEach(function(w){
-    var m=MUSCLES[w.muscle];
-    evs.push({cls:w.muscle, label:'💪'+(m?m.label:w.muscle), id:w.id, kind:'wk'});
+    var m=w.muscle&&MUSCLES[w.muscle];
+    var mLabel=m?m.label:(w.muscle||'筋トレ');
+    var mColor=m?m.color:'#8b5cf6';
+    evs.push({color:mColor, name:'💪 '+mLabel, time:'', id:w.id, kind:'wk'});
   });
   if(evs.length===0){
     openNewSch(ds); return;
