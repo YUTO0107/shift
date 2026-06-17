@@ -55,9 +55,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .sp.green{border-top-color:var(--green)}.sp.purple{border-top-color:var(--purple)}
 .sph{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .sph span{font-size:11px;font-weight:600;color:var(--text2)}
-.ss{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.ss::-webkit-scrollbar{display:none}
-.st{border:2px solid transparent;border-radius:var(--radius-sm);padding:6px 8px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;width:72px;display:flex;flex-direction:column;gap:1px}
+.ss{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;overflow-y:auto;max-height:110px;padding:2px 0;-webkit-overflow-scrolling:touch}
+.st{border:2px solid transparent;border-radius:var(--radius-sm);padding:7px 8px;font-size:11px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;gap:2px}
 .st.on{outline:2px solid var(--accent);outline-offset:1px}
 .st .sn{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .st .sd{font-size:9px;opacity:0.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -231,8 +230,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
   <div class="ph"><h2>設定</h2></div>
   <div style="display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0">
     <button class="tab on" id="stab-schedule">📅 予定</button>
-    <button class="tab" id="stab-workout">💪 筋トレ</button>
     <button class="tab" id="stab-shift">🩺 勤務</button>
+    <button class="tab" id="stab-workout">💪 筋トレ</button>
     <button class="tab" id="stab-other">⚙️ その他</button>
   </div>
   <div class="ps" style="padding:14px">
@@ -240,11 +239,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
     <div id="set-schedule">
       <p class="stl">予定スタンプ</p>
       <div class="sis" id="sch-stamp-list"></div>
-    </div>
-    <!-- 筋トレ -->
-    <div id="set-workout" style="display:none">
-      <p class="stl">筋トレ部位</p>
-      <div class="sis" id="wk-stamp-list"></div>
     </div>
     <!-- 勤務 -->
     <div id="set-shift" style="display:none">
@@ -266,6 +260,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
       </div>
       <p class="stl">今月の収入</p>
       <div class="ic" id="income-card"></div>
+    </div>
+    <!-- 筋トレ -->
+    <div id="set-workout" style="display:none">
+      <p class="stl">筋トレ部位</p>
+      <div class="sis" id="wk-stamp-list"></div>
     </div>
     <!-- その他 -->
     <div id="set-other" style="display:none">
@@ -290,8 +289,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 <div id="nav">
   <button class="nb active" id="nav-home"><i class="ti ti-home"></i>ホーム</button>
   <button class="nb" id="nav-schedule"><i class="ti ti-calendar"></i>予定</button>
-  <button class="nb" id="nav-workout"><i class="ti ti-barbell"></i>筋トレ</button>
   <button class="nb" id="nav-shift"><i class="ti ti-stethoscope"></i>勤務</button>
+  <button class="nb" id="nav-workout"><i class="ti ti-barbell"></i>筋トレ</button>
   <button class="nb" id="nav-settings"><i class="ti ti-settings"></i>設定</button>
 </div>
 
@@ -882,7 +881,7 @@ function renderWkStamps(){
     var m=MUSCLES[k];if(!m)return;
     var isOn=aWkM===k;
     var div=document.createElement('div');
-    div.className='st';div.style.background=m.color+'22';div.style.color=m.color;div.style.borderColor=isOn?m.color:'transparent';div.style.borderWidth='2px';div.style.borderStyle='solid';div.style.width='64px';
+    div.className='st';div.style.background=m.color+'22';div.style.color=m.color;div.style.borderColor=isOn?m.color:'transparent';div.style.borderWidth='2px';div.style.borderStyle='solid';
     div.innerHTML='<div class="sn">'+m.label+'</div>';
     (function(key){div.addEventListener('click',function(){selWkM(key);});})(k);
     el.appendChild(div);
@@ -935,7 +934,7 @@ function renderMuscleCards(){
   var today=new Date();today.setHours(0,0,0,0);
   MKEYS.forEach(function(k){
     var m=MUSCLES[k];if(!m)return;
-    var recs=D.workouts.filter(function(w){return w.muscle===k;}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    var recs=D.workouts.filter(function(w){return w.muscle===k&&new Date(w.date)<=today;}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});
     var last=recs[0],days=null,lastDateStr='';
     if(last){var ld=new Date(last.date);ld.setHours(0,0,0,0);days=Math.floor((today-ld)/(1000*60*60*24));var ld2=new Date(last.date);lastDateStr=(ld2.getMonth()+1)+'/'+ld2.getDate()+'('+['日','月','火','水','木','金','土'][ld2.getDay()]+')';}
     var st=getMuStatus(days);
@@ -991,7 +990,7 @@ function renderHome(){
   g('home-sal').innerHTML='<div class="sc hl"><div class="lbl">今月 総額面</div><div class="val">¥'+fmt(fg+bg2)+'</div><div class="sub">常勤+バイト</div></div><div class="sc gn"><div class="lbl">今月 総手取り</div><div class="val">¥'+fmt(fn+bn)+'</div><div class="sub">概算</div></div>';
   var todayD=new Date();todayD.setHours(0,0,0,0);
   var mHtml='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">';
-  MKEYS.forEach(function(k){var m=MUSCLES[k];if(!m)return;var recs=D.workouts.filter(function(w){return w.muscle===k;}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});var last=recs[0],days=null;if(last){var ld=new Date(last.date);ld.setHours(0,0,0,0);days=Math.floor((todayD-ld)/(1000*60*60*24));}var st=getMuStatus(days);mHtml+='<div style="text-align:center;padding:8px 4px;background:var(--bg3);border-radius:var(--radius-sm)"><div style="font-size:16px;line-height:1;margin-bottom:3px">'+st.emoji+'</div><div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:2px">'+m.label+'</div><div style="font-size:13px;font-weight:700;color:'+m.color+'">'+(days!==null?days:'--')+'<span style="font-size:9px;color:var(--text2)">日</span></div></div>';});
+  MKEYS.forEach(function(k){var m=MUSCLES[k];if(!m)return;var recs=D.workouts.filter(function(w){return w.muscle===k&&new Date(w.date)<=todayD;}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});var last=recs[0],days=null;if(last){var ld=new Date(last.date);ld.setHours(0,0,0,0);days=Math.floor((todayD-ld)/(1000*60*60*24));}var st=getMuStatus(days);mHtml+='<div style="text-align:center;padding:8px 4px;background:var(--bg3);border-radius:var(--radius-sm)"><div style="font-size:16px;line-height:1;margin-bottom:3px">'+st.emoji+'</div><div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:2px">'+m.label+'</div><div style="font-size:13px;font-weight:700;color:'+m.color+'">'+(days!==null?days:'--')+'<span style="font-size:9px;color:var(--text2)">日</span></div></div>';});
   mHtml+='</div>';g('home-mu').innerHTML=mHtml;
 }
 
