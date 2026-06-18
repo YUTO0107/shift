@@ -154,6 +154,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
     <div class="hs"><div class="ht"><i class="ti ti-calendar"></i>今日の予定</div><div id="home-evs"></div></div>
     <div class="hs"><div class="ht"><i class="ti ti-currency-yen"></i>今月の給料</div><div style="padding:12px 14px"><div class="sg" style="margin-bottom:0" id="home-sal"></div></div></div>
     <div class="hs"><div class="ht"><i class="ti ti-barbell"></i>筋トレ状況</div><div style="padding:10px 14px" id="home-mu"></div></div>
+    <div class="hs"><div class="ht"><i class="ti ti-chart-bar"></i>今年の収入</div><div style="padding:14px" id="home-income"></div></div>
+
   </div>
 </div>
 
@@ -260,6 +262,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
       </div>
       <p class="stl">今月の収入</p>
       <div class="ic" id="income-card"></div>
+      <p class="stl" style="margin-top:14px">月別収入入力（今年）</p>
+      <div class="sis" id="monthly-income-inputs"></div>
     </div>
     <!-- 筋トレ -->
     <div id="set-workout" style="display:none">
@@ -436,6 +440,8 @@ var D = {
   ],
   weekPattern:{0:[],1:[],2:[],3:[],4:[],5:[],6:[]},
   settings:{incomeTax:10,residentTax:10,startMonday:true,theme:'medical'},
+  monthlyIncome:{},
+  monthlyOverrides:{},
   ft:{name:'',annualGross:0,monthlyNet:0,payday:25,bonusNet:0}
 };
 
@@ -461,7 +467,7 @@ function ftN(){return D.ft.monthlyNet||0;}
 function bN(g2){var r=(D.settings.incomeTax||10)/100+(D.settings.residentTax||10)/100;return g2*(1-r);}
 
 // ===== 保存・読み込み =====
-function save(){try{localStorage.setItem('myshift_v1',JSON.stringify({shifts:D.shifts,schedules:D.schedules,workouts:D.workouts,stamps:D.stamps,schStamps:D.schStamps,weekPattern:D.weekPattern,settings:D.settings,ft:D.ft,mkeys:MKEYS,muscles:MUSCLES}));}catch(e){}}
+function save(){try{localStorage.setItem('myshift_v1',JSON.stringify({shifts:D.shifts,schedules:D.schedules,workouts:D.workouts,stamps:D.stamps,schStamps:D.schStamps,weekPattern:D.weekPattern,settings:D.settings,ft:D.ft,mkeys:MKEYS,muscles:MUSCLES,monthlyIncome:D.monthlyIncome,monthlyOverrides:D.monthlyOverrides}));}catch(e){}}
 function load(){
   var keys=['myshift_v1','ds6','ds5','ds4','ds3'];
   for(var i=0;i<keys.length;i++){
@@ -478,6 +484,8 @@ function load(){
       if(p.weekPattern) D.weekPattern=p.weekPattern;
       if(p.settings) D.settings=Object.assign({incomeTax:10,residentTax:10,startMonday:true,theme:'medical'},p.settings);
       if(p.ft) D.ft=p.ft;
+      if(p.monthlyIncome) D.monthlyIncome=p.monthlyIncome;
+      if(p.monthlyOverrides) D.monthlyOverrides=p.monthlyOverrides;
       if(p.mkeys&&p.muscles){
         MKEYS.length=0;
         p.mkeys.forEach(function(k){MKEYS.push(k);});
@@ -502,7 +510,7 @@ function showPage(p){
   else if(p==='schedule'){renderCal('sch');renderSchStamps();}
   else if(p==='workout'){renderCal('wk');renderWkStamps();renderMuscleCards();updWkCount();}
   else if(p==='shift'){renderCal('sh');renderShStamps();updShTotal();}
-  else if(p==='settings'){loadSettingsUI();showSetTab(curSetTab);}
+  else if(p==='settings'){showSetTab(curSetTab);loadSettingsUI();}
 }
 
 // ===== 設定タブ =====
@@ -514,7 +522,7 @@ function showSetTab(tab){
   });
   if(tab==='schedule') renderSchStampList();
   else if(tab==='workout') renderWkStampList();
-  else if(tab==='shift'){renderShStampList();renderIncomeCard();loadSettingsUI();}
+  else if(tab==='shift'){renderShStampList();renderSettingsIncomeCard();renderMonthlyIncomeInputs();}
   else if(tab==='other') renderThemeBtns();
 }
 
@@ -975,6 +983,509 @@ function openEditMu(key){var m=MUSCLES[key];if(!m)return;editMuKey=key;muColor=m
 function renderMuColors(){var el=g('mu-colors');if(!el)return;el.innerHTML='';MCOLS.forEach(function(c){var div=document.createElement('div');div.style.cssText='width:32px;height:32px;border-radius:50%;background:'+c+';cursor:pointer;border:3px solid '+(muColor===c?'var(--text)':'transparent');(function(col){div.addEventListener('click',function(){muColor=col;renderMuColors();});})(c);el.appendChild(div);});}
 function saveMu(){var nm=g('mu-name').value.trim();if(!nm){alert('部位名を入力してください');return;}if(editMuKey){MUSCLES[editMuKey].label=nm;MUSCLES[editMuKey].color=muColor;}else{var key='mu'+Date.now();MUSCLES[key]={label:nm,color:muColor};MKEYS.push(key);}save();closeOv('mu-ov');renderWkStampList();renderWkStamps();renderMuscleCards();updWkCount();}
 
+// ===== 勤務回数推移（削除済み）=====
+function renderTrendCard_disabled(){
+  var el=document.getElementById('sh-trend-card');
+  if(!el) return;
+
+  // 過去6ヶ月分のデータを集計
+  var now=new Date();
+  var months=[];
+  for(var i=5;i>=0;i--){
+    var d=new Date(now.getFullYear(), now.getMonth()-i, 1);
+    var y=d.getFullYear(), m=d.getMonth();
+    var label=(m+1)+'月';
+    var ms=D.shifts.filter(function(s){
+      var sd=new Date(s.date);
+      return sd.getFullYear()===y && sd.getMonth()===m;
+    });
+    var spot=ms.filter(function(s){return s.type==='spot';}).length;
+    var oncall=ms.filter(function(s){return s.type==='oncall';}).length;
+    var total=spot+oncall;
+    months.push({label:label, spot:spot, oncall:oncall, total:total});
+  }
+
+  var maxTotal=Math.max.apply(null, months.map(function(m){return m.total||1;}));
+  maxTotal=Math.max(maxTotal,1);
+
+  // テーブル＋バーグラフ
+  var html='';
+
+  // グラフエリア
+  html+='<div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:12px;padding:0 2px">';
+  months.forEach(function(m){
+    var spotH=Math.round((m.spot/maxTotal)*68);
+    var oncallH=Math.round((m.oncall/maxTotal)*68);
+    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0">';
+    html+='<div style="font-size:9px;color:var(--text3);margin-bottom:2px">'+(m.total||'')+'</div>';
+    html+='<div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:68px;gap:1px">';
+    if(m.oncall>0) html+='<div style="width:100%;height:'+oncallH+'px;background:#ef4444;border-radius:2px 2px 0 0;opacity:0.85"></div>';
+    if(m.spot>0)   html+='<div style="width:100%;height:'+spotH+'px;background:#f59e0b;border-radius:'+(m.oncall>0?'0':'2px 2px')+' 0 0;opacity:0.85"></div>';
+    if(m.total===0) html+='<div style="width:100%;height:3px;background:var(--border);border-radius:2px;margin-top:auto"></div>';
+    html+='</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+
+  // 月ラベル
+  html+='<div style="display:flex;gap:6px;margin-bottom:12px;padding:0 2px">';
+  months.forEach(function(m){
+    html+='<div style="flex:1;text-align:center;font-size:10px;color:var(--text2)">'+m.label+'</div>';
+  });
+  html+='</div>';
+
+  // 凡例
+  html+='<div style="display:flex;gap:12px;margin-bottom:12px">';
+  html+='<div style="display:flex;align-items:center;gap:4px"><div style="width:12px;height:12px;background:#f59e0b;border-radius:2px"></div><span style="font-size:11px;color:var(--text2)">スポット</span></div>';
+  html+='<div style="display:flex;align-items:center;gap:4px"><div style="width:12px;height:12px;background:#ef4444;border-radius:2px"></div><span style="font-size:11px;color:var(--text2)">待機</span></div>';
+  html+='</div>';
+
+  // 数値テーブル
+  html+='<div style="border-top:1px solid var(--border);padding-top:10px">';
+  html+='<div style="display:grid;grid-template-columns:40px repeat(6,1fr);gap:4px;font-size:10px;font-weight:600;color:var(--text3);margin-bottom:6px">';
+  html+='<div></div>';
+  months.forEach(function(m){html+='<div style="text-align:center">'+m.label+'</div>';});
+  html+='</div>';
+  // スポット行
+  html+='<div style="display:grid;grid-template-columns:40px repeat(6,1fr);gap:4px;font-size:11px;margin-bottom:4px">';
+  html+='<div style="color:var(--text2);font-weight:600">SPT</div>';
+  months.forEach(function(m){html+='<div style="text-align:center;font-weight:600;color:'+(m.spot>0?'#f59e0b':'var(--text3)')+'">'+m.spot+'</div>';});
+  html+='</div>';
+  // 待機行
+  html+='<div style="display:grid;grid-template-columns:40px repeat(6,1fr);gap:4px;font-size:11px;margin-bottom:4px">';
+  html+='<div style="color:var(--text2);font-weight:600">待機</div>';
+  months.forEach(function(m){html+='<div style="text-align:center;font-weight:600;color:'+(m.oncall>0?'#ef4444':'var(--text3)')+'">'+m.oncall+'</div>';});
+  html+='</div>';
+  // 合計行
+  html+='<div style="display:grid;grid-template-columns:40px repeat(6,1fr);gap:4px;font-size:11px;border-top:1px solid var(--border);padding-top:4px">';
+  html+='<div style="color:var(--text2);font-weight:700">計</div>';
+  months.forEach(function(m){html+='<div style="text-align:center;font-weight:700;color:var(--text)">'+m.total+'</div>';});
+  html+='</div>';
+  html+='</div>';
+
+  el.innerHTML=html;
+}
+
+// ===== 筋トレ月間回数推移（削除済み）=====
+function renderWkTrendCard_disabled(){
+  var el=document.getElementById('wk-trend-card');
+  if(!el) return;
+
+  var now=new Date();
+  var months=[];
+  for(var i=5;i>=0;i--){
+    var d=new Date(now.getFullYear(), now.getMonth()-i, 1);
+    var y=d.getFullYear(), m=d.getMonth();
+    var label=(m+1)+'月';
+    var recs=D.workouts.filter(function(w){
+      var wd=new Date(w.date);
+      return wd.getFullYear()===y && wd.getMonth()===m;
+    });
+    var byMuscle={};
+    MKEYS.forEach(function(k){ byMuscle[k]=0; });
+    recs.forEach(function(w){ if(byMuscle[w.muscle]!==undefined) byMuscle[w.muscle]++; });
+    var total=recs.length;
+    months.push({label:label, byMuscle:byMuscle, total:total});
+  }
+
+  var maxTotal=Math.max.apply(null, months.map(function(m){return m.total||1;}));
+  maxTotal=Math.max(maxTotal,1);
+
+  // 部位カラー（MUSCLESから取得）
+  var mColors=[];
+  MKEYS.forEach(function(k){ mColors.push((MUSCLES[k]&&MUSCLES[k].color)||'#888'); });
+
+  var html='';
+
+  // 積み上げ棒グラフ
+  html+='<div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:8px;padding:0 2px">';
+  months.forEach(function(mo){
+    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center">';
+    html+='<div style="font-size:9px;color:var(--text3);margin-bottom:2px">'+(mo.total||'')+'</div>';
+    html+='<div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:68px;gap:1px">';
+    if(mo.total===0){
+      html+='<div style="width:100%;height:3px;background:var(--border);border-radius:2px;margin-top:auto"></div>';
+    } else {
+      // 部位ごとに積み上げ（逆順で下から）
+      var drawn=[];
+      MKEYS.slice().reverse().forEach(function(k,ri){
+        var cnt=mo.byMuscle[k]||0;
+        if(cnt===0) return;
+        var h=Math.max(4, Math.round((cnt/maxTotal)*68));
+        var col=(MUSCLES[k]&&MUSCLES[k].color)||'#888';
+        var isFirst=drawn.length===0;
+        drawn.push(k);
+        html+='<div style="width:100%;height:'+h+'px;background:'+col+';border-radius:'+(isFirst?'2px 2px':'0')+' 0 0;opacity:0.85"></div>';
+      });
+    }
+    html+='</div></div>';
+  });
+  html+='</div>';
+
+  // 月ラベル
+  html+='<div style="display:flex;gap:6px;margin-bottom:10px;padding:0 2px">';
+  months.forEach(function(mo){
+    html+='<div style="flex:1;text-align:center;font-size:10px;color:var(--text2)">'+mo.label+'</div>';
+  });
+  html+='</div>';
+
+  // 凡例
+  html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">';
+  MKEYS.forEach(function(k){
+    var m=MUSCLES[k]; if(!m) return;
+    html+='<div style="display:flex;align-items:center;gap:3px"><div style="width:10px;height:10px;background:'+m.color+';border-radius:2px"></div><span style="font-size:11px;color:var(--text2)">'+m.label+'</span></div>';
+  });
+  html+='</div>';
+
+  // 数値テーブル
+  html+='<div style="border-top:1px solid var(--border);padding-top:10px">';
+  // ヘッダー行
+  html+='<div style="display:grid;grid-template-columns:36px repeat(6,1fr);gap:3px;font-size:10px;font-weight:600;color:var(--text3);margin-bottom:5px">';
+  html+='<div></div>';
+  months.forEach(function(mo){html+='<div style="text-align:center">'+mo.label+'</div>';});
+  html+='</div>';
+  // 部位ごとの行
+  MKEYS.forEach(function(k){
+    var m=MUSCLES[k]; if(!m) return;
+    html+='<div style="display:grid;grid-template-columns:36px repeat(6,1fr);gap:3px;font-size:11px;margin-bottom:3px">';
+    html+='<div style="font-weight:600;color:'+m.color+'">'+m.label+'</div>';
+    months.forEach(function(mo){
+      var cnt=mo.byMuscle[k]||0;
+      html+='<div style="text-align:center;font-weight:600;color:'+(cnt>0?m.color:'var(--text3)')+'">'+cnt+'</div>';
+    });
+    html+='</div>';
+  });
+  // 合計行
+  html+='<div style="display:grid;grid-template-columns:36px repeat(6,1fr);gap:3px;font-size:11px;border-top:1px solid var(--border);padding-top:4px;margin-top:2px">';
+  html+='<div style="color:var(--text2);font-weight:700">計</div>';
+  months.forEach(function(mo){html+='<div style="text-align:center;font-weight:700;color:var(--text)">'+mo.total+'</div>';});
+  html+='</div>';
+  html+='</div>';
+
+  el.innerHTML=html;
+}
+
+// ===== 月別収入ユーティリティ =====
+function getAutoIncome(y, m){
+  // 勤務データから自動集計
+  // 未来月は予測しない（常勤も含めない）
+  var now=new Date(); now.setHours(0,0,0,0);
+  var isFuture=(y>now.getFullYear())||(y===now.getFullYear()&&m>now.getMonth());
+  if(isFuture) return 0;
+  var shifts=D.shifts.filter(function(s){
+    var d=new Date(s.date);
+    return d.getFullYear()===y && d.getMonth()===m;
+  });
+  // 常勤は設定の月額固定（今月以前のみ加算）
+  var ft=ftG();
+  var baite=shifts.filter(function(s){return s.type!=='full-time';})
+    .reduce(function(a,s){return a+(+s.amount||0)+(+s.transport||0);},0);
+  return ft+baite;
+}
+function getMonthIncome(y, m){
+  var key=y+'-'+m;
+  // 手入力値（monthlyOverrides）のみ参照。自動集計は使わない
+  if(Object.prototype.hasOwnProperty.call(D.monthlyOverrides, key)){
+    var v=D.monthlyOverrides[key];
+    return isNaN(parseFloat(v))?0:parseFloat(v);
+  }
+  return 0;
+}
+
+// ===== ホーム収入サマリー =====
+function renderIncomeCard(){
+  var el=document.getElementById('home-income');
+  if(!el) return;
+  var now=new Date();
+  var curY=now.getFullYear();
+
+  // 手入力済み（monthlyOverrides）のみ合計
+  var total=0;
+  var months=[];
+  for(var m=0;m<12;m++){
+    var key=curY+'-'+m;
+    var hasVal=Object.prototype.hasOwnProperty.call(D.monthlyOverrides,key);
+    var amt=hasVal?parseFloat(D.monthlyOverrides[key])||0:0;
+    if(hasVal) total+=amt;
+    months.push({m:m,amt:amt,hasVal:hasVal});
+  }
+
+  var html='';
+  html+='<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:12px 14px">';
+  html+='<div style="font-size:11px;color:var(--text2);margin-bottom:4px">1〜12月 累積収入</div>';
+  html+='<div style="font-size:24px;font-weight:700;color:var(--accent)">¥'+fmt(total)+'</div>';
+  var enteredMonths=months.filter(function(x){return x.hasVal;}).length;
+  html+='<div style="font-size:10px;color:var(--text3);margin-top:2px">'+curY+'年 入力済み'+enteredMonths+'ヶ月分</div>';
+  html+='</div>';
+
+  el.innerHTML=html;
+}
+
+// ===== 月別収入入力（設定画面）=====
+function renderMonthlyIncomeInputs(){
+  var el=document.getElementById('monthly-income-inputs');
+  if(!el) return;
+  var now=new Date();
+  var curY=now.getFullYear();
+  el.innerHTML='';
+
+  // 一括操作ボタン
+  var bulkDiv=document.createElement('div');
+  bulkDiv.style.cssText='padding:10px 16px;display:flex;gap:8px;border-bottom:1px solid var(--border)';
+  var btnAll=document.createElement('button');
+  btnAll.className='btn btnp';btnAll.style.fontSize='12px';btnAll.textContent='全月を自動取得';
+  btnAll.addEventListener('click',function(){
+    for(var m=0;m<12;m++){
+      var key=curY+'-'+m;
+      D.monthlyOverrides[key]=getAutoIncome(curY,m);
+    }
+    save();renderMonthlyIncomeInputs();renderIncomeCard();
+  });
+  var btnClr=document.createElement('button');
+  btnClr.className='btn btns';btnClr.style.fontSize='12px';btnClr.textContent='全月クリア';
+  btnClr.addEventListener('click',function(){
+    if(!confirm('全月の入力値をクリアしますか？')) return;
+    for(var m=0;m<12;m++){delete D.monthlyOverrides[curY+'-'+m];}
+    save();renderMonthlyIncomeInputs();renderIncomeCard();
+  });
+  bulkDiv.appendChild(btnAll);bulkDiv.appendChild(btnClr);
+  el.appendChild(bulkDiv);
+
+  // 月別行
+  for(var m=0;m<12;m++){
+    (function(month){
+      var key=curY+'-'+month;
+      var hasVal=Object.prototype.hasOwnProperty.call(D.monthlyOverrides,key);
+      var savedVal=hasVal?D.monthlyOverrides[key]:'';
+
+      var row=document.createElement('div');
+      row.style.cssText='padding:12px 16px;border-bottom:1px solid var(--border)';
+
+      // 月ラベル
+      var lbl=document.createElement('div');
+      lbl.style.cssText='font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px';
+      lbl.textContent=(month+1)+'月';
+      row.appendChild(lbl);
+
+      // 入力欄エリア
+      var inputRow=document.createElement('div');
+      inputRow.style.cssText='display:flex;align-items:center;gap:8px';
+
+      var inp=document.createElement('input');
+      inp.type='number';
+      inp.placeholder='0';
+      inp.value=hasVal?savedVal:'';
+      inp.style.cssText='flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:16px;text-align:right';
+
+      var yen=document.createElement('span');
+      yen.style.cssText='font-size:13px;color:var(--text2);flex-shrink:0';
+      yen.textContent='円';
+
+      inputRow.appendChild(inp);
+      inputRow.appendChild(yen);
+      row.appendChild(inputRow);
+
+      // ボタンエリア
+      var btnRow=document.createElement('div');
+      btnRow.style.cssText='display:flex;gap:6px;margin-top:6px';
+
+      var btnAuto=document.createElement('button');
+      btnAuto.style.cssText='font-size:11px;padding:5px 10px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer';
+      btnAuto.textContent='自動取得';
+
+      var btnClear=document.createElement('button');
+      btnClear.style.cssText='font-size:11px;padding:5px 10px;border-radius:var(--radius-sm);border:1px solid var(--red);background:none;color:var(--red);cursor:pointer';
+      btnClear.textContent='クリア';
+
+      btnRow.appendChild(btnAuto);
+      btnRow.appendChild(btnClear);
+      row.appendChild(btnRow);
+      el.appendChild(row);
+
+      // イベント: IIFEで inp と key を閉じ込める
+      (function(thisInp, thisKey, thisMonth){
+        function doSave(){
+          var v=thisInp.value.trim();
+          if(v===''){
+            delete D.monthlyOverrides[thisKey];
+          } else {
+            var num=parseFloat(v);
+            D.monthlyOverrides[thisKey]=isNaN(num)?0:num;
+          }
+          save();
+          renderIncomeCard();
+        }
+        thisInp.addEventListener('input', doSave);
+        thisInp.addEventListener('change', doSave);
+        thisInp.addEventListener('blur', doSave);
+
+        btnAuto.addEventListener('click',function(){
+          var auto=getAutoIncome(curY, thisMonth);
+          thisInp.value=auto;
+          D.monthlyOverrides[thisKey]=auto;
+          save();renderIncomeCard();
+        });
+
+        btnClear.addEventListener('click',function(){
+          thisInp.value='';
+          delete D.monthlyOverrides[thisKey];
+          save();renderIncomeCard();
+        });
+      })(inp, key, month);
+    })(m);
+  }
+}
+
+// ===== 収入・税金サマリー（削除済み）=====
+function renderTaxSummary_disabled(){
+  var el=document.getElementById('home-tax');
+  if(!el) return;
+  var now=new Date();
+  var curY=now.getFullYear();
+  var curM=now.getMonth(); // 0-based
+
+  // 月別集計（0〜11月）
+  var monthly=[];
+  for(var m=0;m<12;m++){
+    var shifts=D.shifts.filter(function(s){
+      var d=new Date(s.date);
+      return d.getFullYear()===curY && d.getMonth()===m;
+    });
+    var ftIncome = (m<=curM) ? ftG() : 0; // 常勤は月額
+    var baiteGross = shifts.filter(function(s){return s.type!=='full-time';})
+      .reduce(function(a,s){return a+(+s.amount||0)+(+s.transport||0);},0);
+    monthly.push({ft:ftIncome, baite:baiteGross, total:ftIncome+baiteGross});
+  }
+
+  // 今月まで実績
+  var actualTotal=0;
+  for(var m=0;m<=curM;m++) actualTotal+=monthly[m].total;
+
+  // バイト平均（今月まで）
+  var baiteTotalActual=0;
+  for(var m=0;m<=curM;m++) baiteTotalActual+=monthly[m].baite;
+  var baiteAvg = curM>=0 ? Math.round(baiteTotalActual/(curM+1)) : 0;
+
+  // 未来月を予測で埋める
+  var ftMonthly = D.ft.monthlyNet>0 ? ftG() : 0;
+  for(var m=curM+1;m<12;m++){
+    monthly[m].ft = ftMonthly;
+    monthly[m].baite = baiteAvg;
+    monthly[m].total = ftMonthly + baiteAvg;
+  }
+
+  // 予想年収（常勤年俸 + バイト予測）
+  var ftAnnual = D.ft.annualGross||0;
+  var baiteAnnualEst = baiteTotalActual + baiteAvg*(12-curM-1);
+  var estAnnual = ftAnnual + baiteAnnualEst;
+
+  // 累積グラフ用データ（今月まで実績、以降予測）
+  var cumulative=[];
+  var sum=0;
+  for(var m=0;m<12;m++){
+    sum+=monthly[m].total;
+    cumulative.push(sum);
+  }
+  var maxCum=Math.max(cumulative[11],1);
+
+  // 税金概算（医師向け簡易計算）
+  // 所得税: 累進課税の簡易版
+  function calcIncomeTax(income){
+    if(income<=1950000) return Math.round(income*0.05);
+    if(income<=3300000) return Math.round(income*0.10-97500);
+    if(income<=6950000) return Math.round(income*0.20-427500);
+    if(income<=9000000) return Math.round(income*0.23-636000);
+    if(income<=18000000) return Math.round(income*0.33-1536000);
+    return Math.round(income*0.40-2796000);
+  }
+  // 課税所得（給与所得控除を差し引き）
+  function kyuyoKojo(income){
+    if(income<=1625000) return 550000;
+    if(income<=1800000) return Math.round(income*0.40-100000);
+    if(income<=3600000) return Math.round(income*0.30+80000);
+    if(income<=6600000) return Math.round(income*0.20+440000);
+    if(income<=8500000) return Math.round(income*0.10+1100000);
+    return 1950000;
+  }
+  var kojo=kyuyoKojo(estAnnual);
+  var basicKojo=480000; // 基礎控除
+  var kaseiShotoku=Math.max(0, estAnnual - kojo - basicKojo);
+  var estIT=calcIncomeTax(kaseiShotoku);
+  var estRT=Math.round(kaseiShotoku*0.10); // 住民税10%
+  var estTax=estIT+estRT;
+
+  // 月別グラフ
+  var mLabels=['1','2','3','4','5','6','7','8','9','10','11','12'];
+  var chartH=60;
+
+  var html='';
+
+  // 累積グラフ
+  html+='<div style="margin-bottom:12px">';
+  html+='<div style="font-size:11px;color:var(--text2);margin-bottom:6px">月別累積収入（実績＋予測）</div>';
+  html+='<div style="position:relative;height:'+chartH+'px;background:var(--bg3);border-radius:var(--radius-sm);overflow:hidden">';
+  // 折れ線グラフ（SVG）
+  var pts=cumulative.map(function(v,i){
+    var x=Math.round((i+0.5)/12*100);
+    var y=Math.round((1-v/maxCum)*chartH);
+    return x+'%,'+y+'px';
+  });
+  // エリア塗りつぶし
+  var polyPts='0px,'+chartH+'px '+pts.map(function(p){return p.replace(',','px,').replace('%,','%,');}).join(' ')+' 100%,'+chartH+'px';
+  // 実績/予測の分岐線
+  var splitX=Math.round((curM+1)/12*100);
+  html+='<div style="position:absolute;left:'+splitX+'%;top:0;bottom:0;width:1px;background:var(--border2);opacity:0.7"></div>';
+  html+='<svg width="100%" height="'+chartH+'" viewBox="0 0 360 '+chartH+'" preserveAspectRatio="none" style="position:absolute;inset:0">';
+  // エリア
+  var svgPts=cumulative.map(function(v,i){return Math.round((i+0.5)/12*360)+','+ Math.round((1-v/maxCum)*chartH);});
+  html+='<polygon points="0,'+chartH+' '+svgPts.join(' ')+' 360,'+chartH+'" fill="var(--accent)" opacity="0.15"/>';
+  // ライン
+  html+='<polyline points="'+svgPts.join(' ')+'" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>';
+  // 今月の点
+  var nowX=Math.round((curM+0.5)/12*360);
+  var nowY=Math.round((1-cumulative[curM]/maxCum)*chartH);
+  html+='<circle cx="'+nowX+'" cy="'+nowY+'" r="4" fill="var(--accent)"/>';
+  html+='</svg>';
+  html+='</div>';
+  // 月ラベル（3ヶ月おき）
+  html+='<div style="display:flex;justify-content:space-between;margin-top:3px">';
+  [0,3,6,9,11].forEach(function(i){
+    html+='<span style="font-size:9px;color:var(--text3)">'+(i+1)+'月</span>';
+  });
+  html+='</div>';
+  html+='<div style="display:flex;gap:12px;margin-top:4px;font-size:10px;color:var(--text3)">';
+  html+='<span style="color:var(--accent)">── 実績</span><span style="opacity:0.6">── 予測（| 以降）</span>';
+  html+='</div>';
+  html+='</div>';
+
+  // 収入サマリー
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">';
+  html+='<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px 12px"><div style="font-size:11px;color:var(--text2);margin-bottom:3px">今年の累計収入</div><div style="font-size:17px;font-weight:700;color:var(--accent)">¥'+fmt(actualTotal)+'</div><div style="font-size:9px;color:var(--text3)">'+(curM+1)+'月末まで実績</div></div>';
+  html+='<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px 12px"><div style="font-size:11px;color:var(--text2);margin-bottom:3px">予想年収</div><div style="font-size:17px;font-weight:700;color:var(--text)">¥'+fmt(estAnnual)+'</div><div style="font-size:9px;color:var(--text3)">実績＋残月予測</div></div>';
+  html+='</div>';
+
+  // 税金サマリー
+  html+='<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px">';
+  html+='<div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">概算税額（年間・目安）</div>';
+  var taxRows=[
+    ['課税所得（推計）','¥'+fmt(kaseiShotoku),'var(--text)'],
+    ['概算所得税','¥'+fmt(estIT),'#ef4444'],
+    ['概算住民税','¥'+fmt(estRT),'#f59e0b'],
+    ['税負担合計','¥'+fmt(estTax),'#ef4444'],
+  ];
+  taxRows.forEach(function(r){
+    html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px;color:var(--text2)">'+r[0]+'</span><span style="font-size:13px;font-weight:700;color:'+r[2]+'">'+r[1]+'</span></div>';
+  });
+  // 積み立て目安
+  var reserve=Math.round(estTax/12);
+  html+='<div style="display:flex;justify-content:space-between;padding:5px 0;margin-top:2px"><span style="font-size:12px;color:var(--text2)">月々の積立目安</span><span style="font-size:13px;font-weight:700;color:#8b5cf6">¥'+fmt(reserve)+' /月</span></div>';
+  html+='</div>';
+
+  html+='<div style="font-size:10px;color:var(--text3);line-height:1.5;padding:2px 0">※ 税額はあくまで目安です。実際の税額は確定申告で確認してください。給与所得控除・基礎控除のみ考慮した簡易計算です。</div>';
+
+  el.innerHTML=html;
+}
+
 // ===== ホーム =====
 function renderHome(){
   var today=new Date(),ds=toDS(today),dow=['日','月','火','水','木','金','土'][today.getDay()];
@@ -992,6 +1503,7 @@ function renderHome(){
   var mHtml='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">';
   MKEYS.forEach(function(k){var m=MUSCLES[k];if(!m)return;var recs=D.workouts.filter(function(w){return w.muscle===k&&new Date(w.date)<=todayD;}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});var last=recs[0],days=null;if(last){var ld=new Date(last.date);ld.setHours(0,0,0,0);days=Math.floor((todayD-ld)/(1000*60*60*24));}var st=getMuStatus(days);mHtml+='<div style="text-align:center;padding:8px 4px;background:var(--bg3);border-radius:var(--radius-sm)"><div style="font-size:16px;line-height:1;margin-bottom:3px">'+st.emoji+'</div><div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:2px">'+m.label+'</div><div style="font-size:13px;font-weight:700;color:'+m.color+'">'+(days!==null?days:'--')+'<span style="font-size:9px;color:var(--text2)">日</span></div></div>';});
   mHtml+='</div>';g('home-mu').innerHTML=mHtml;
+  renderIncomeCard();
 }
 
 // ===== 設定UI =====
@@ -1008,7 +1520,7 @@ function loadSettingsUI(){
 }
 function saveFt(){D.ft={name:g('s-ft-name').value,annualGross:nv('s-ft-annual'),monthlyNet:nv('s-ft-net'),payday:parseInt(g('s-ft-payday').value)||25,bonusNet:nv('s-ft-bonus')};save();renderFtPreview();renderHome();}
 function renderFtPreview(){var ft=D.ft;if(!g('ft-preview'))return;if(!ft.annualGross&&!ft.monthlyNet){g('ft-preview').innerHTML='';return;}var m=ft.annualGross?Math.round(ft.annualGross/12):0;g('ft-preview').innerHTML='<div class="ftc"><div class="fcr"><span style="color:var(--text2)">月額換算</span><span>¥'+fmt(m)+'</span></div><div class="fcr"><span style="color:var(--text2)">月額手取り</span><span style="color:var(--green)">¥'+fmt(ft.monthlyNet)+'</span></div><div class="fcr tot"><span>年間手取り概算</span><span style="color:var(--accent)">¥'+fmt(ft.monthlyNet*12+(ft.bonusNet||0))+'</span></div></div>';}
-function renderIncomeCard(){
+function renderSettingsIncomeCard(){
   var now=new Date(),ms=D.shifts.filter(function(s){var d=new Date(s.date);return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();});
   var baite=ms.filter(function(s){return s.type!=='full-time';});
   var fg=ftG(),fn=ftN(),bg2=baite.reduce(function(a,s){return a+(+s.amount||0)+(+s.transport||0);},0),bn=baite.reduce(function(a,s){return a+bN(+s.amount||0);},0);
