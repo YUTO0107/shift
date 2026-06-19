@@ -37,7 +37,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .nb i{font-size:22px}
 .nb.on{color:var(--acc)}
 /* ページ */
-.pg{display:none;position:fixed;top:env(safe-area-inset-top,0);left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:calc(var(--navh) + env(safe-area-inset-bottom,0));flex-direction:column;overflow:hidden;box-sizing:border-box}
+.pg{display:none;position:fixed;top:env(safe-area-inset-top,0);left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:calc(var(--navh) + env(safe-area-inset-bottom,0));flex-direction:column;overflow:hidden}
 .pg.on{display:flex}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:16px}
 /* ヘッダー */
@@ -58,10 +58,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .stat.acc{background:var(--acc-bg)}.stat.acc .stat-v{color:var(--acc)}
 .stat.grn{background:var(--green-bg)}.stat.grn .stat-v{color:var(--green)}
 /* カレンダー */
-.dow{display:grid;grid-template-columns:repeat(7,1fr);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;width:100%}
 .dow-c{text-align:center;padding:5px 0;font-size:11px;font-weight:500;color:var(--text2)}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);width:100%}
-.cd{background:var(--bg2);min-height:56px;padding:3px 2px;cursor:pointer;position:relative}
+.cd{background:var(--bg2);min-height:52px;padding:2px 2px;cursor:pointer;position:relative}
 .cd:active{background:var(--bg3)}
 .cd.om .dn{color:var(--text3)!important}
 .cd.sun .dn{color:var(--red)}
@@ -75,19 +75,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .ev-more{font-size:9px;color:var(--text3)}
 [data-theme="dark"] .ev.ft{background:#1e3a5f;color:#93c5fd}[data-theme="dark"] .ev.pt{background:#064e3b;color:#6ee7b7}[data-theme="dark"] .ev.sp{background:#451a03;color:#fcd34d}[data-theme="dark"] .ev.oc{background:#450a0a;color:#fca5a5}
 /* スタンプ */
-.sp-panel{background:var(--bg2);border-top:3px solid var(--acc);padding:8px 12px 6px;flex-shrink:0;max-height:160px}
+.sp-panel{background:var(--bg2);border-top:3px solid var(--acc);padding:6px 12px 4px;flex-shrink:0;position:relative;z-index:10}
 .sp-panel.grn{border-top-color:var(--green)}
 .sp-panel.pu{border-top-color:var(--purple)}
-.sp-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.sp-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
 .sp-hd span{font-size:11px;font-weight:600;color:var(--text2)}
-.sp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-height:110px;overflow-y:auto}
-.stamp{border:2px solid transparent;border-radius:var(--rs);padding:7px 8px;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.sp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;max-height:90px;overflow-y:auto}
+.stamp{border:2px solid transparent;border-radius:var(--rs);padding:5px 6px;cursor:pointer;display:flex;flex-direction:column;gap:1px}
 .stamp.on{outline:2px solid var(--acc);outline-offset:1px}
 .stamp .sn{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stamp .st{font-size:9px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stamp.ft{background:#dbeafe;color:#1e40af}.stamp.pt{background:#d1fae5;color:#065f46}.stamp.sp{background:#fed7aa;color:#92400e}.stamp.oc{background:#fee2e2;color:#991b1b}
 [data-theme="dark"] .stamp.ft{background:#1e3a5f;color:#93c5fd}[data-theme="dark"] .stamp.pt{background:#064e3b;color:#6ee7b7}[data-theme="dark"] .stamp.sp{background:#451a03;color:#fcd34d}[data-theme="dark"] .stamp.oc{background:#450a0a;color:#fca5a5}
-.sp-hint{font-size:10px;color:var(--text3);text-align:center;padding:3px 0 0}
+.sp-hint{font-size:10px;color:var(--text3);text-align:center;padding:2px 0 0}
 /* 筋トレカード */
 .mu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0}
 .mu-card{background:var(--bg2);border-radius:var(--r);padding:12px;border:1px solid var(--border);border-left:4px solid var(--border);cursor:pointer}
@@ -195,21 +195,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
   <div class="dow" id="sh-dow" style="flex-shrink:0"></div>
   <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;width:100%">
     <div class="cal" id="sh-cal" style="width:100%"></div>
+    <div style="background:var(--bg2);border-top:3px solid var(--acc);padding:6px 12px 4px">
+      <div class="sp-hd">
+        <span><i class="ti ti-stamp" style="font-size:13px;margin-right:3px"></i>スタンプ</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span id="multi-cnt" style="font-size:11px;color:var(--acc);display:none"></span>
+          <button id="sh-st-add" style="background:none;border:1px solid var(--border2);border-radius:var(--rs);padding:3px 8px;font-size:11px;color:var(--text2);cursor:pointer">+ 追加</button>
+        </div>
+      </div>
+      <div class="sp-grid" id="sh-stamps"></div>
+      <div class="sp-hint" id="sh-hint">スタンプ選択 → 日付タップで登録</div>
+    </div>
     <div style="padding:14px">
       <p class="stl" style="margin-bottom:10px">勤務回数推移（過去6ヶ月）</p>
       <div id="sh-trend" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px"></div>
     </div>
-  </div>
-  <div class="sp-panel" style="flex-shrink:0">
-    <div class="sp-hd">
-      <span><i class="ti ti-stamp" style="font-size:13px;margin-right:3px"></i>スタンプ</span>
-      <div style="display:flex;gap:6px;align-items:center">
-        <span id="multi-cnt" style="font-size:11px;color:var(--acc);display:none"></span>
-        <button id="sh-st-add" style="background:none;border:1px solid var(--border2);border-radius:var(--rs);padding:3px 8px;font-size:11px;color:var(--text2);cursor:pointer">+ 追加</button>
-      </div>
-    </div>
-    <div class="sp-grid" id="sh-stamps"></div>
-    <div class="sp-hint" id="sh-hint">スタンプ選択 → 日付タップで登録</div>
   </div>
 </div>
 
@@ -228,7 +228,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
     </div>
   </div>
   <div class="dow" id="wk-dow" style="flex-shrink:0"></div>
-  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;width:100%">
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;width:100%;-webkit-overflow-scrolling:touch">
     <div class="cal" id="wk-cal" style="width:100%"></div>
     <div style="padding:14px">
       <p class="stl" style="margin-bottom:10px">部位の状態</p>
@@ -236,11 +236,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
       <p class="stl" style="margin-bottom:10px;margin-top:4px">部位別月間回数（過去6ヶ月）</p>
       <div id="wk-trend" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px"></div>
     </div>
-  </div>
-  <div class="sp-panel pu" style="flex-shrink:0">
-    <div class="sp-hd"><span><i class="ti ti-barbell" style="font-size:13px;margin-right:3px"></i>部位スタンプ</span></div>
-    <div class="sp-grid" id="wk-stamps"></div>
-    <div class="sp-hint" id="wk-hint">部位を選択 → 日付タップで記録</div>
+    <div style="background:var(--bg2);border-top:3px solid var(--purple);padding:6px 12px 4px">
+      <div class="sp-hd"><span><i class="ti ti-barbell" style="font-size:13px;margin-right:3px"></i>部位スタンプ</span></div>
+      <div class="sp-grid" id="wk-stamps"></div>
+      <div class="sp-hint" id="wk-hint">部位を選択 → 日付タップで記録</div>
+    </div>
   </div>
 </div>
 
