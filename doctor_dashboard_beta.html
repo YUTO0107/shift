@@ -462,10 +462,26 @@ function calcTakeHome(shifts){
   return ft + Math.round(oc*ocRate) + Math.round(sp*spRate) + other;
 }
 function getShiftIncome(y,m){
+  // 自動計算（勤務カレンダーから）: 手取りベース
   var ms=D.shifts.filter(function(s){var d=new Date(s.date);return d.getFullYear()===y&&d.getMonth()===m;});
-  var ft=ftN(); // 常勤は月額手取りを使う
-  var baite=ms.filter(function(s){return s.type!=='ft';}).reduce(function(a,s){return a+(+s.amount||0)+(+s.transport||0);},0);
-  return ft+baite;
+  return calcTakeHome(ms);
+}
+function getShiftGross(y,m){
+  // 自動計算（額面）: 勤務カレンダーから
+  var ms=D.shifts.filter(function(s){var d=new Date(s.date);return d.getFullYear()===y&&d.getMonth()===m;});
+  if(ms.length===0) return 0;
+  var hasFt=ms.some(function(s){return s.type==='ft';});
+  var ftGross=hasFt?(D.ft.annualGross?Math.round(D.ft.annualGross/12):0):0;
+  var otherGross=ms.filter(function(s){return s.type!=='ft';}).reduce(function(a,s){return a+(+s.amount||0)+(+s.transport||0);},0);
+  return ftGross+otherGross;
+}
+function getEffectiveIncome(y,m){
+  // 手入力 > 自動計算 の優先ルール（額面基準）
+  var key=y+'-'+m;
+  if(Object.prototype.hasOwnProperty.call(D.incomeOverrides,key)){
+    return parseFloat(D.incomeOverrides[key])||0;
+  }
+  return getShiftGross(y,m);
 }
 function getMonthIncome(y,m){
   // incomeOverridesに入力済みの月だけ返す。未入力は0円
@@ -1040,21 +1056,13 @@ function renderCumulative(){
   var y=now.getFullYear();
   var totalGross=0;
   for(var m=0;m<12;m++){
-    var ms=D.shifts.filter(function(s){
-      var d=new Date(s.date);
-      return d.getFullYear()===y&&d.getMonth()===m;
-    });
-    if(ms.length===0) continue;
-    var hasFt=ms.some(function(s){return s.type==='ft';});
-    var ftGross=hasFt?(D.ft.annualGross?Math.round(D.ft.annualGross/12):0):0;
-    var otherGross=ms.filter(function(s){return s.type!=='ft';}).reduce(function(a,s){return a+(+s.amount||0)+(+s.transport||0);},0);
-    totalGross+=ftGross+otherGross;
+    totalGross+=getEffectiveIncome(y,m);
   }
   el.innerHTML=
     '<div style="background:var(--bg3);border-radius:var(--rs);padding:12px 14px">'
     +'<div style="font-size:11px;color:var(--text2);margin-bottom:4px">総収入（額面）</div>'
     +'<div style="font-size:24px;font-weight:700;color:var(--text)">¥'+fmt(totalGross)+'</div>'
-    +'<div style="font-size:10px;color:var(--text3);margin-top:4px">'+y+'年 勤務データがある月の合計</div>'
+    +'<div style="font-size:10px;color:var(--text3);margin-top:4px">'+y+'年（手入力優先・未入力月は勤務データから）</div>'
     +'</div>';
 }
 
