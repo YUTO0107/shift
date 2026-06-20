@@ -1054,15 +1054,19 @@ function renderCumulative(){
   var el=g('h-cumulative'); if(!el) return;
   var now=new Date();
   var y=now.getFullYear();
-  var totalGross=0;
+  // 手入力済みの月だけ合計（自動計算は使わない）
+  var total=0;
   for(var m=0;m<12;m++){
-    totalGross+=getEffectiveIncome(y,m);
+    var key=y+'-'+m;
+    if(Object.prototype.hasOwnProperty.call(D.incomeOverrides,key)){
+      total+=parseFloat(D.incomeOverrides[key])||0;
+    }
   }
   el.innerHTML=
     '<div style="background:var(--bg3);border-radius:var(--rs);padding:12px 14px">'
     +'<div style="font-size:11px;color:var(--text2);margin-bottom:4px">総収入（額面）</div>'
-    +'<div style="font-size:24px;font-weight:700;color:var(--text)">¥'+fmt(totalGross)+'</div>'
-    +'<div style="font-size:10px;color:var(--text3);margin-top:4px">'+y+'年（手入力優先・未入力月は勤務データから）</div>'
+    +'<div style="font-size:24px;font-weight:700;color:var(--text)">¥'+fmt(total)+'</div>'
+    +'<div style="font-size:10px;color:var(--text3);margin-top:4px">'+y+'年 手入力済み月の合計</div>'
     +'</div>';
 }
 
