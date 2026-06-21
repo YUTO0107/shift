@@ -9,7 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#111827">
 <title>Dr収入管理</title>
-<link rel="manifest" href="./manifest.json">
+<link rel="manifest" href="./manifest.json?v=20260621-2">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.9.0/dist/tabler-icons.min.css">
@@ -1798,7 +1798,7 @@ renderShTrend();
   if(!allowSW) return;
 
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./service-worker.js', {scope: './'})
+    navigator.serviceWorker.register('./service-worker.js?v=20260621-2', {scope: './'})
       .then(function(reg){
         reg.addEventListener('updatefound', function(){
           var nw = reg.installing;

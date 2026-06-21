@@ -1,10 +1,9 @@
 // ============================================================
-// Dr収入管理 - Service Worker
-// キャッシュ名: dr-income-cache-v3
+// Dr収入管理 - Service Worker v20260621-2
 // HTMLは常にネットワーク取得、静的リソースのみキャッシュ
 // ============================================================
 
-var CACHE_NAME = 'dr-income-cache-v3';
+var CACHE_NAME = 'dr-income-cache-v20260621-2';
 
 var STATIC_FILES = [
   './manifest.json',
@@ -24,12 +23,13 @@ self.addEventListener('install', function(event) {
         })
       );
     }).then(function() {
+      // 即座にアクティブ化（待機しない）
       return self.skipWaiting();
     })
   );
 });
 
-// ===== アクティベート: 古いキャッシュを全削除 =====
+// ===== アクティベート: 旧キャッシュを全削除 =====
 self.addEventListener('activate', function(event) {
   event.waitUntil(
     caches.keys().then(function(keys) {
@@ -37,10 +37,12 @@ self.addEventListener('activate', function(event) {
         keys.filter(function(key) {
           return key !== CACHE_NAME;
         }).map(function(key) {
+          console.log('[SW] 旧キャッシュ削除:', key);
           return caches.delete(key);
         })
       );
     }).then(function() {
+      // 既存のクライアントも即座に制御下に置く
       return self.clients.claim();
     })
   );
@@ -52,18 +54,24 @@ self.addEventListener('fetch', function(event) {
 
   var url = event.request.url;
 
-  // HTML (.html) は常にネットワーク優先、キャッシュしない
-  if (url.indexOf('.html') !== -1 || url.indexOf('?v=') !== -1) {
+  // HTML は絶対にキャッシュしない・常にネットワーク優先
+  if (
+    url.indexOf('.html') !== -1 ||
+    url.indexOf('?v=') !== -1 ||
+    event.request.headers.get('accept').indexOf('text/html') !== -1
+  ) {
     event.respondWith(
-      fetch(event.request).catch(function() {
-        // オフライン時のみキャッシュから返す
-        return caches.match('./doctor_dashboard_pwa.html');
+      fetch(event.request, { cache: 'no-store' }).catch(function() {
+        // オフライン時のフォールバック（キャッシュなし）
+        return new Response('<h1>オフラインです</h1>', {
+          headers: { 'Content-Type': 'text/html; charset=utf-8' }
+        });
       })
     );
     return;
   }
 
-  // 静的リソース: Cache First
+  // 静的リソース (CSS/フォント/アイコン): Cache First
   event.respondWith(
     caches.match(event.request).then(function(cached) {
       if (cached) return cached;
