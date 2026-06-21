@@ -52,7 +52,7 @@ body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background
 /* ヘッダー */
 .ph{background:var(--bg2);padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .ph-title{font-size:16px;font-weight:700}
-.ch{background:var(--bg2);padding:6px 16px;padding-top:calc(28px + env(safe-area-inset-top,0px));display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
+.ch{background:var(--bg2);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
 .ch h3{font-size:15px;font-weight:600}
 .cnb{background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;padding:4px 8px}
 /* カード */
@@ -165,21 +165,7 @@ body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background
 
 /* ===== PWA追加CSS ===== */
 /* ---- 保存ステータス + ホーム再読み込みボタンエリア ---- */
-#pwa-topbar{
-  position:fixed;
-  top:var(--sat);
-  left:50%;
-  transform:translateX(-50%);
-  width:100%;
-  max-width:430px;
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  gap:5px;
-  padding:4px 10px 2px;
-  z-index:300;
-  pointer-events:none;
-}
+#pwa-topbar{display:none!important;}
 /* 個別要素はpointer-events: auto で操作可能に */
 #save-badge{
   font-size:9px;font-weight:700;
@@ -187,8 +173,8 @@ body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background
   background:var(--green-bg);color:var(--green);
   border:1px solid var(--green);
   opacity:0;transition:opacity .4s;
-  pointer-events:none;
   white-space:nowrap;
+  flex-shrink:0;
 }
 #save-badge.saving{background:#fef3c7;color:#92400e;border-color:#d97706;opacity:1;}
 #save-badge.saved{opacity:1;}
@@ -547,18 +533,18 @@ html.is-pwa, body.is-pwa {
 </head>
 <body>
 
-<!-- PWA topbar: 保存バッジ + 再読み込みボタン -->
-<div id="pwa-topbar">
-  <span id="save-badge">保存済み</span>
-  <button id="reload-fab" onclick="reloadApp(false)" title="再読み込み">↻</button>
-</div>
+<!-- pwa-topbar は .ch 内に統合済み -->
 
 <!-- ホーム -->
 <div class="pg on" id="pg-home">
   <div class="ch" style="flex-shrink:0">
     <button class="cnb" id="h-prev"><i class="ti ti-chevron-left"></i></button>
     <h3 id="h-title" style="font-size:15px"></h3>
-    <button class="cnb" id="h-next"><i class="ti ti-chevron-right"></i></button>
+    <div style="display:flex;align-items:center;gap:5px">
+      <span id="save-badge">保存済み</span>
+      <button id="reload-fab" onclick="reloadApp(false)" title="再読み込み">↻</button>
+      <button class="cnb" id="h-next"><i class="ti ti-chevron-right"></i></button>
+    </div>
   </div>
   <div class="scroll" style="padding-top:4px">
     <div class="card">
@@ -583,7 +569,10 @@ html.is-pwa, body.is-pwa {
   <div class="ch" style="flex-shrink:0">
     <button class="cnb" id="sh-prev"><i class="ti ti-chevron-left"></i></button>
     <h3 id="sh-title"></h3>
-    <button class="cnb" id="sh-next"><i class="ti ti-chevron-right"></i></button>
+    <div style="display:flex;align-items:center;gap:4px">
+      <button id="reload-fab-sh-prev" onclick="reloadApp(false)" title="再読み込み" style="width:26px;height:26px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;">↻</button>
+      <button class="cnb" id="sh-next"><i class="ti ti-chevron-right"></i></button>
+    </div>
   </div>
   <div class="sh-summary">
     <div class="sh-summary-left">
@@ -621,7 +610,10 @@ html.is-pwa, body.is-pwa {
   <div class="ch" style="flex-shrink:0">
     <button class="cnb" id="wk-prev"><i class="ti ti-chevron-left"></i></button>
     <h3 id="wk-title"></h3>
-    <button class="cnb" id="wk-next"><i class="ti ti-chevron-right"></i></button>
+    <div style="display:flex;align-items:center;gap:4px">
+      <button id="reload-fab-wk-prev" onclick="reloadApp(false)" title="再読み込み" style="width:26px;height:26px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;">↻</button>
+      <button class="cnb" id="wk-next"><i class="ti ti-chevron-right"></i></button>
+    </div>
   </div>
   <!-- 今月カウントバー -->
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:6px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
