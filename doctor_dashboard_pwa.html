@@ -23,7 +23,7 @@
   --green:#059669;--green-bg:#ecfdf5;
   --red:#dc2626;--orange:#d97706;
   --purple:#7c3aed;
-  --r:10px;--rs:6px;--navh:48px;
+  --r:10px;--rs:6px;--navh:52px;
   /* safe-area は body.is-pwa ブロック内で管理 */
 }
 [data-theme="dark"]{
@@ -39,7 +39,7 @@ html{background:var(--bg)}
 body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:var(--text);font-size:14px;max-width:430px;margin:0 auto}
 /* ナビ */
 #nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:0}
-.nb{flex:1;padding:6px 4px 4px;border:none;background:none;color:var(--text3);font-size:9px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .15s}
+.nb{flex:1;padding:8px 4px 6px;border:none;background:none;color:var(--text3);font-size:9px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .15s}
 .nb i{font-size:22px}
 .nb.on{color:var(--acc)}
 /* ページ */
@@ -49,17 +49,17 @@ body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background
 /* ヘッダー */
 .ph{background:var(--bg2);padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .ph-title{font-size:16px;font-weight:700}
-.ch{background:var(--bg2);padding:6px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
+.ch{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
 .ch h3{font-size:15px;font-weight:600}
 .cnb{background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;padding:4px 8px}
 /* カード */
-.card{background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin:0 12px 9px;overflow:hidden}
+.card{background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin:0 12px 14px;overflow:hidden}
 .card-title{padding:8px 12px 6px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
-.card-body{padding:12px}
+.card-body{padding:14px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat{background:var(--bg3);border-radius:var(--rs);padding:8px 10px}
+.stat{background:var(--bg3);border-radius:var(--rs);padding:10px 12px}
 .stat-l{font-size:11px;color:var(--text2);margin-bottom:3px}
-.stat-v{font-size:18px;font-weight:700}
+.stat-v{font-size:20px;font-weight:700}
 .stat-s{font-size:10px;color:var(--text3);margin-top:2px}
 .stat.acc{background:var(--acc-bg)}.stat.acc .stat-v{color:var(--acc)}
 .stat.grn{background:var(--green-bg)}.stat.grn .stat-v{color:var(--green)}
@@ -536,10 +536,7 @@ body.is-pwa {
 <body>
 
 <!-- PWA topbar: 保存バッジ + 再読み込みボタン -->
-<div id="pwa-topbar">
-  <span id="save-badge">保存済み</span>
-  <button id="reload-fab" onclick="reloadApp(false)" title="再読み込み">↻</button>
-</div>
+<span id="save-badge" style="display:none">保存済み</span>
 
 <!-- ホーム -->
 <div class="pg on" id="pg-home">
