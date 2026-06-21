@@ -1,9 +1,9 @@
 // ============================================================
 // Dr収入管理 - Service Worker
-// キャッシュ名: dr-income-cache-v1
+// キャッシュ名: dr-income-cache-v2
 // ============================================================
 
-var CACHE_NAME = 'dr-income-cache-v1';
+var CACHE_NAME = 'dr-income-cache-v2';
 
 var CACHE_FILES = [
   './doctor_dashboard_pwa.html',
