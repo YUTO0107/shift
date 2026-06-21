@@ -913,6 +913,57 @@ body.is-pwa {
 }
 .is-pwa .wk-sp-grid .stamp .sn { font-size: 13px !important; }
 .is-pwa .wk-sp-grid .stamp .st { font-size: 10px !important; }
+
+/* ===== 勤務スタンプグリッド (2列・押しやすい) ===== */
+.sh-sp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.sh-sp-grid .stamp {
+  padding: 10px 12px !important;
+  border-radius: 10px !important;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px !important;
+}
+.sh-sp-grid .stamp .sn {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+.sh-sp-grid .stamp .st {
+  font-size: 11px !important;
+  opacity: .75;
+  white-space: normal !important;
+  overflow: visible !important;
+}
+.sh-sp-grid .stamp.on {
+  outline: 2px solid var(--acc) !important;
+  outline-offset: 2px;
+}
+
+/* ===== カレンダーセル: 勤務・筋トレタブで少し大きく ===== */
+#pg-shift  .cd,
+#pg-workout .cd {
+  min-height: 58px !important;
+}
+
+/* is-pwa でも同サイズ維持 */
+.is-pwa .sh-sp-grid .stamp {
+  padding: 10px 12px !important;
+  min-height: 50px;
+}
+.is-pwa .sh-sp-grid .stamp .sn { font-size: 13px !important; }
+.is-pwa .sh-sp-grid .stamp .st { font-size: 10px !important; }
+.is-pwa #pg-shift  .cd,
+.is-pwa #pg-workout .cd {
+  min-height: 54px !important;
+}
 </style>
 </head>
 <body>
@@ -968,21 +1019,20 @@ body.is-pwa {
   <div class="dow" id="sh-dow" style="flex-shrink:0"></div>
   <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;width:100%;padding-top:0">
     <div class="cal" id="sh-cal" style="width:100%"></div>
-    <div style="background:var(--bg2);border-top:3px solid var(--acc);padding:6px 12px 4px">
-      <div class="sp-hd">
-        <span><i class="ti ti-stamp" style="font-size:13px;margin-right:3px"></i>スタンプ</span>
+    <!-- 勤務スタンプ (2列・大きめ) -->
+    <div style="background:var(--bg2);border-top:3px solid var(--acc);padding:10px 14px 8px">
+      <div class="sp-hd" style="margin-bottom:8px">
+        <span style="font-size:13px;font-weight:700;color:var(--text)"><i class="ti ti-stamp" style="font-size:14px;margin-right:5px;color:var(--acc)"></i>スタンプ</span>
         <div style="display:flex;gap:6px;align-items:center">
           <span id="multi-cnt" style="font-size:11px;color:var(--acc);display:none"></span>
-          <button id="sh-st-add" style="background:none;border:1px solid var(--border2);border-radius:var(--rs);padding:3px 8px;font-size:11px;color:var(--text2);cursor:pointer">+ 追加</button>
+          <button id="sh-st-add" style="background:none;border:1px solid var(--border2);border-radius:var(--rs);padding:4px 10px;font-size:11px;color:var(--text2);cursor:pointer">+ 追加</button>
         </div>
       </div>
-      <div class="sp-grid" id="sh-stamps"></div>
-      <div class="sp-hint" id="sh-hint">スタンプ選択 → 日付タップで登録</div>
+      <div class="sh-sp-grid" id="sh-stamps"></div>
+      <div class="sp-hint" id="sh-hint" style="padding:4px 0 0;font-size:11px">スタンプ選択 → 日付タップで登録</div>
     </div>
-    <div style="padding:14px">
-      <p class="stl" style="margin-bottom:10px">勤務回数推移（過去6ヶ月）</p>
-      <div id="sh-trend" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px"></div>
-    </div>
+    <!-- 推移 (非表示・ID保持) -->
+    <div id="sh-trend" style="display:none"></div>
   </div>
 </div>
 
@@ -1989,32 +2039,7 @@ function renderIncomeInputs(){
 
 // ========== グラフ ==========
 function renderShTrend(){
-  var el=g('sh-trend'); if(!el) return;
-  var now=new Date();
-  var months=[];
-  for(var i=5;i>=0;i--){
-    var d=new Date(now.getFullYear(),now.getMonth()-i,1);
-    var y=d.getFullYear(),m=d.getMonth();
-    var ms=D.shifts.filter(function(s){var sd=new Date(s.date);return sd.getFullYear()===y&&sd.getMonth()===m;});
-    months.push({label:(m+1)+'月',total:ms.length,sp:ms.filter(function(s){return s.type==='sp';}).length,oc:ms.filter(function(s){return s.type==='oc';}).length});
-  }
-  var maxT=Math.max.apply(null,months.map(function(m){return m.total;}))||1;
-  var html='<div style="font-size:11px;color:var(--text2);margin-bottom:10px">勤務回数推移（過去6ヶ月）</div>';
-  months.forEach(function(mo){
-    var pw=Math.round(mo.total/maxT*100);
-    var sw=Math.round(mo.sp/maxT*100);
-    var ow=Math.round(mo.oc/maxT*100);
-    html+='<div class="bar-row"><div class="bar-label">'+mo.label+'</div>';
-    html+='<div style="flex:1"><div style="display:flex;gap:2px;margin-bottom:2px">';
-    html+='<div style="height:14px;width:'+pw+'%;background:var(--acc);border-radius:3px;opacity:.7;min-width:'+(mo.total>0?4:0)+'px"></div></div>';
-    html+='<div style="display:flex;gap:6px;font-size:9px;color:var(--text3)"><span>SPT:'+mo.sp+'</span><span>待機:'+mo.oc+'</span><span>計:'+mo.total+'</span></div></div>';
-    html+='<div class="bar-val">'+mo.total+'</div></div>';
-  });
-  // 凡例
-  html+='<div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:var(--text2)">'
-    +'<span>■ <span style="color:var(--acc)">合計</span></span>'
-    +'<span>SPT:スポット 待機:待機</span></div>';
-  el.innerHTML=html;
+  // 勤務回数推移は非表示（sh-trend は display:none）
 }
 
 function renderWkTrend(){
