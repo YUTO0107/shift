@@ -39,18 +39,18 @@
 html,body{height:100%;overflow:hidden;background:var(--bg)}
 body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:var(--text);font-size:14px;max-width:430px;margin:0 auto}
 /* ナビ */
-#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:var(--sab)}
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:0}
 .nb{flex:1;padding:8px 4px 6px;border:none;background:none;color:var(--text3);font-size:9px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .15s}
 .nb i{font-size:22px}
 .nb.on{color:var(--acc)}
 /* ページ */
-.pg{display:none;position:fixed;top:var(--sat);left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:calc(var(--navh) + var(--sab));flex-direction:column;overflow:hidden;align-items:stretch}
+.pg{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:var(--navh);flex-direction:column;overflow:hidden;align-items:stretch}
 .pg.on{display:flex}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:16px}
 /* ヘッダー */
 .ph{background:var(--bg2);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .ph-title{font-size:17px;font-weight:700}
-.ch{background:var(--bg2);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;padding-top:calc(8px + var(--sat))}
+.ch{background:var(--bg2);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
 .ch h3{font-size:16px;font-weight:600}
 .cnb{background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;padding:4px 8px}
 /* カード */
@@ -162,10 +162,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .nb2{background:var(--acc-bg);border-radius:var(--rs);padding:9px 12px;font-size:12px;color:var(--acc);margin-top:8px}
 
 /* ===== PWA追加CSS ===== */
-/* ---- ナビ: 高さ抑制 ---- */
-.nb{padding:7px 4px 5px;}
-.nb i{font-size:20px;}
-
 /* ---- 保存ステータス + ホーム再読み込みボタンエリア ---- */
 #pwa-topbar{
   position:fixed;
@@ -211,10 +207,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 }
 #reload-fab:active{background:var(--bg3);}
 
-/* ホームの月ナビ: topbarボタンと被らないよう右矢印を少し内側に */
-#pg-home .ch .cnb:last-child{
-  margin-right:68px;
-}
+/* 月ナビ矢印調整はPWA専用ブロックに移譲 */
 
 /* ---- 今月の合計エリア: 詰まり解消 ---- */
 .sh-summary{
@@ -240,24 +233,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 }
 #sh-total{font-size:17px;font-weight:700;color:var(--acc);white-space:nowrap;}
 
-/* ---- スタンプグリッド: 2列（スマホ幅） ---- */
-.sp-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:4px;
-  max-height:82px;
-  overflow-y:auto;
-}
-@media(min-width:360px){
-  .sp-grid{grid-template-columns:repeat(3,1fr);}
-}
-@media(min-width:430px){
-  .sp-grid{grid-template-columns:repeat(4,1fr);}
-}
-/* スタンプカード: 高さ抑制・文字小さく */
-.stamp{padding:4px 5px;gap:1px;}
-.stamp .sn{font-size:10px;}
-.stamp .st{font-size:8px;}
+/* スタンプグリッド調整はPWA専用ブロックに移譲 */
 
 /* ---- 再読み込みボタン（設定画面内） ---- */
 .reload-section{margin-bottom:14px;}
@@ -271,81 +247,155 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .reload-btn.primary{background:var(--acc);color:#fff;border-color:var(--acc);}
 
 /* =====================================================
-   PWA standalone 専用CSS
-   body.pwa-standalone の時だけ適用
-   Safari通常表示には影響しない
+   PWA standalone 専用CSS  (body.pwa-standalone のみ)
+   ・Safari通常表示はそのまま維持
+   ・safe-area-inset は ここで一度だけ適用（二重なし）
    ===================================================== */
 
-/* ---- topbar: PWA時は safe-area-top 分だけ下げる ---- */
-.pwa-standalone #pwa-topbar {
-  padding-top: calc(4px + env(safe-area-inset-top, 0px));
+/* --------------------------------------------------
+   レイアウト基本変数 (PWA時に上書き)
+   -------------------------------------------------- */
+.pwa-standalone {
+  /* ナビ高さ = アイコン+ラベル+インジケーター */
+  --navh: calc(44px + env(safe-area-inset-bottom, 0px));
 }
 
-/* ---- ヘッダー(ch): PWA時は safe-area-top 分を確保 ---- */
-.pwa-standalone .ch {
-  padding-top: calc(10px + env(safe-area-inset-top, 0px));
-}
-
-/* ---- pg コンテナ: PWA時は top を safe-area 込みで確保 ---- */
+/* --------------------------------------------------
+   ページコンテナ: top/bottom を safe-area込みで一発確定
+   -------------------------------------------------- */
 .pwa-standalone .pg {
   top: env(safe-area-inset-top, 0px);
-  bottom: calc(var(--navh) + env(safe-area-inset-bottom, 0px));
+  bottom: var(--navh);
 }
 
-/* ---- 下部ナビ: ホームインジケーターと被らない ---- */
+/* --------------------------------------------------
+   下部ナビ: インジケーター分だけ padding-bottom
+   -------------------------------------------------- */
 .pwa-standalone #nav {
-  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-/* navh をインジケーター込みの高さに合わせる */
-.pwa-standalone {
-  --navh-pwa: calc(52px + 8px + env(safe-area-inset-bottom, 0px));
-}
-.pwa-standalone .pg {
-  bottom: var(--navh-pwa, calc(52px + env(safe-area-inset-bottom, 0px)));
-}
-
-/* ---- nb ボタン: PWA時は少し詰める ---- */
+/* ナビボタン: 高さ圧縮 */
 .pwa-standalone .nb {
-  padding: 6px 4px 4px;
+  padding: 5px 4px 4px;
+  font-size: 9px;
 }
+.pwa-standalone .nb i { font-size: 19px; }
 
-/* ---- カレンダーセル: PWA時は高さを抑える ---- */
-.pwa-standalone .cd {
-  min-height: 44px;
+/* --------------------------------------------------
+   ヘッダー (ch): ノッチ/Dynamic Island 分だけ top padding
+   -------------------------------------------------- */
+.pwa-standalone .ch {
+  padding-top: calc(6px + env(safe-area-inset-top, 0px));
+  padding-bottom: 6px;
 }
+.pwa-standalone .ch h3 { font-size: 14px; }
+.pwa-standalone .cnb   { font-size: 20px; padding: 3px 6px; }
 
-/* ---- スタンプグリッド: PWA時は強制2列・余白圧縮 ---- */
-.pwa-standalone .sp-grid {
-  grid-template-columns: repeat(2, 1fr) !important;
-  gap: 3px;
-  max-height: 72px;
+/* 設定ページのヘッダー ph */
+.pwa-standalone .ph {
+  padding: calc(8px + env(safe-area-inset-top, 0px)) 16px 8px;
 }
-.pwa-standalone .stamp {
-  padding: 3px 4px;
-}
-.pwa-standalone .stamp .sn { font-size: 10px; }
-.pwa-standalone .stamp .st { font-size: 8px; }
+.pwa-standalone .ph-title { font-size: 15px; }
 
-/* ---- スタンプパネル自体の余白圧縮 ---- */
-.pwa-standalone .sp-panel,
-.pwa-standalone [style*="border-top:3px solid"] {
-  padding: 4px 10px 2px;
+/* --------------------------------------------------
+   topbar (保存バッジ + 再読み込み)
+   -------------------------------------------------- */
+.pwa-standalone #pwa-topbar {
+  top: env(safe-area-inset-top, 0px);
+  padding: 3px 10px 2px;
 }
-
-/* ---- 保存バッジ: PWA時は少し小さく・右端余白を確保 ---- */
 .pwa-standalone #save-badge {
   font-size: 8px;
   padding: 1px 6px;
 }
-.pwa-standalone #pwa-topbar {
-  padding-right: 12px;
+.pwa-standalone #reload-fab {
+  width: 24px;
+  height: 24px;
+  font-size: 13px;
 }
 
-/* ---- カレンダーヘッダー曜日行: 少し詰める ---- */
+/* --------------------------------------------------
+   月ナビ右矢印: topbar と被らない
+   -------------------------------------------------- */
+.pwa-standalone #pg-home .ch .cnb:last-child {
+  margin-right: 64px;
+}
+
+/* --------------------------------------------------
+   今月の合計バー
+   -------------------------------------------------- */
+.pwa-standalone .sh-summary {
+  padding: 5px 12px;
+}
+.pwa-standalone .sh-summary-left .lbl { font-size: 10px; }
+.pwa-standalone .sh-summary-left .sub { font-size: 9px; }
+.pwa-standalone #sh-total             { font-size: 15px; }
+.pwa-standalone #bulk-btn             { padding: 4px 8px; font-size: 10px; }
+
+/* --------------------------------------------------
+   曜日ヘッダー行
+   -------------------------------------------------- */
 .pwa-standalone .dow-c {
-  padding: 4px 0;
+  padding: 3px 0;
   font-size: 10px;
 }
+
+/* --------------------------------------------------
+   カレンダーセル: 高さを抑えてスタンプエリアを確保
+   -------------------------------------------------- */
+.pwa-standalone .cd {
+  min-height: 42px;
+  padding: 1px 2px;
+}
+.pwa-standalone .dn {
+  font-size: 11px;
+  width: 20px;
+  height: 20px;
+}
+.pwa-standalone .ev {
+  font-size: 8px;
+  padding: 0 2px;
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------
+   スタンプエリア
+   -------------------------------------------------- */
+.pwa-standalone .sp-panel,
+.pwa-standalone [style*="border-top:3px solid var(--acc)"],
+.pwa-standalone [style*="border-top:3px solid var(--green)"],
+.pwa-standalone [style*="border-top:3px solid var(--purple)"] {
+  padding: 3px 10px 2px;
+}
+.pwa-standalone .sp-hd         { margin-bottom: 3px; }
+.pwa-standalone .sp-hd span    { font-size: 10px; }
+.pwa-standalone .sp-hint       { padding: 1px 0 0; font-size: 9px; }
+
+/* スタンプグリッド: 2列固定・高さ圧縮 */
+.pwa-standalone .sp-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 3px;
+  max-height: 64px;
+}
+.pwa-standalone .stamp    { padding: 3px 4px; gap: 0; }
+.pwa-standalone .stamp .sn{ font-size: 10px; }
+.pwa-standalone .stamp .st{ font-size: 8px; }
+
+/* --------------------------------------------------
+   設定タブ
+   -------------------------------------------------- */
+.pwa-standalone .stab { padding: 7px 4px; font-size: 10px; }
+
+/* 設定フォーム行 */
+.pwa-standalone .ssi      { padding: 9px 14px; }
+.pwa-standalone .ssi-l    { font-size: 13px; }
+.pwa-standalone .ssi-s    { font-size: 10px; }
+.pwa-standalone .li       { padding: 8px 14px; }
+.pwa-standalone .stl      { margin-bottom: 6px; }
+
+/* スタンプリスト行 */
+.pwa-standalone .li-nm    { font-size: 12px; }
+.pwa-standalone .li-dt    { font-size: 10px; }
 </style>
 </head>
 <body>
