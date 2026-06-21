@@ -269,6 +269,83 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
   font-size:12px;font-weight:600;cursor:pointer;
 }
 .reload-btn.primary{background:var(--acc);color:#fff;border-color:var(--acc);}
+
+/* =====================================================
+   PWA standalone 専用CSS
+   body.pwa-standalone の時だけ適用
+   Safari通常表示には影響しない
+   ===================================================== */
+
+/* ---- topbar: PWA時は safe-area-top 分だけ下げる ---- */
+.pwa-standalone #pwa-topbar {
+  padding-top: calc(4px + env(safe-area-inset-top, 0px));
+}
+
+/* ---- ヘッダー(ch): PWA時は safe-area-top 分を確保 ---- */
+.pwa-standalone .ch {
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+}
+
+/* ---- pg コンテナ: PWA時は top を safe-area 込みで確保 ---- */
+.pwa-standalone .pg {
+  top: env(safe-area-inset-top, 0px);
+  bottom: calc(var(--navh) + env(safe-area-inset-bottom, 0px));
+}
+
+/* ---- 下部ナビ: ホームインジケーターと被らない ---- */
+.pwa-standalone #nav {
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+}
+/* navh をインジケーター込みの高さに合わせる */
+.pwa-standalone {
+  --navh-pwa: calc(52px + 8px + env(safe-area-inset-bottom, 0px));
+}
+.pwa-standalone .pg {
+  bottom: var(--navh-pwa, calc(52px + env(safe-area-inset-bottom, 0px)));
+}
+
+/* ---- nb ボタン: PWA時は少し詰める ---- */
+.pwa-standalone .nb {
+  padding: 6px 4px 4px;
+}
+
+/* ---- カレンダーセル: PWA時は高さを抑える ---- */
+.pwa-standalone .cd {
+  min-height: 44px;
+}
+
+/* ---- スタンプグリッド: PWA時は強制2列・余白圧縮 ---- */
+.pwa-standalone .sp-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 3px;
+  max-height: 72px;
+}
+.pwa-standalone .stamp {
+  padding: 3px 4px;
+}
+.pwa-standalone .stamp .sn { font-size: 10px; }
+.pwa-standalone .stamp .st { font-size: 8px; }
+
+/* ---- スタンプパネル自体の余白圧縮 ---- */
+.pwa-standalone .sp-panel,
+.pwa-standalone [style*="border-top:3px solid"] {
+  padding: 4px 10px 2px;
+}
+
+/* ---- 保存バッジ: PWA時は少し小さく・右端余白を確保 ---- */
+.pwa-standalone #save-badge {
+  font-size: 8px;
+  padding: 1px 6px;
+}
+.pwa-standalone #pwa-topbar {
+  padding-right: 12px;
+}
+
+/* ---- カレンダーヘッダー曜日行: 少し詰める ---- */
+.pwa-standalone .dow-c {
+  padding: 4px 0;
+  font-size: 10px;
+}
 </style>
 </head>
 <body>
@@ -1574,6 +1651,24 @@ renderCal('sh'); renderCal('wk');
 renderShStamps(); renderWkStamps();
 renderMuCards(); updShTotal(); updWkCount();
 renderShTrend();
+
+
+// ===== PWA standalone 判定: body に pwa-standalone クラスを付与 =====
+(function(){
+  var isStandalone =
+    (window.navigator.standalone === true) ||
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  if(isStandalone){
+    document.body.classList.add('pwa-standalone');
+  }
+  // 後から standalone になった場合も対応（念のため）
+  if(window.matchMedia){
+    window.matchMedia('(display-mode: standalone)').addEventListener('change', function(e){
+      if(e.matches) document.body.classList.add('pwa-standalone');
+      else document.body.classList.remove('pwa-standalone');
+    });
+  }
+})();
 
 // ===== PWA: Service Worker 登録 =====
 (function(){
