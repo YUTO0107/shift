@@ -46,13 +46,13 @@ body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background
 .nb i{font-size:22px}
 .nb.on{color:var(--acc)}
 /* ページ */
-.pg{display:none;position:fixed;top:env(safe-area-inset-top,0px);left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:var(--navh);flex-direction:column;overflow:hidden;align-items:stretch}
+.pg{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:var(--navh);flex-direction:column;overflow:hidden;align-items:stretch}
 .pg.on{display:flex}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:10px}
 /* ヘッダー */
 .ph{background:var(--bg2);padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .ph-title{font-size:16px;font-weight:700}
-.ch{background:var(--bg2);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
+.ch{background:var(--bg2);padding:8px 16px;padding-top:calc(8px + env(safe-area-inset-top,0px));display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
 .ch h3{font-size:15px;font-weight:600}
 .cnb{background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;padding:4px 8px}
 /* カード */
@@ -542,7 +542,7 @@ html.is-pwa, body.is-pwa {
     <h3 id="h-title" style="font-size:15px"></h3>
     <button class="cnb" id="h-next"><i class="ti ti-chevron-right"></i></button>
   </div>
-  <div style="position:absolute;top:6px;right:10px;z-index:10;display:flex;align-items:center;gap:5px">
+  <div style="position:absolute;top:calc(6px + env(safe-area-inset-top,0px));right:10px;z-index:10;display:flex;align-items:center;gap:5px">
     <span id="save-badge">保存済み</span>
     <button onclick="reloadApp(false)" style="width:26px;height:26px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);color:var(--text2);font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.1)">↻</button>
   </div>
