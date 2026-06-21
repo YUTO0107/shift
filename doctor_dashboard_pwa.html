@@ -24,8 +24,7 @@
   --red:#dc2626;--orange:#d97706;
   --purple:#7c3aed;
   --r:10px;--rs:6px;--navh:52px;
-  --sat:env(safe-area-inset-top,0px);
-  --sab:env(safe-area-inset-bottom,0px);
+  /* safe-area は body.is-pwa ブロック内で管理 */
 }
 [data-theme="dark"]{
   --bg:#0f1117;--bg2:#1a1d27;--bg3:#242736;
@@ -36,7 +35,7 @@
   --red:#f87171;--orange:#fbbf24;
   --purple:#a78bfa;
 }
-html,body{height:100%;overflow:hidden;background:var(--bg)}
+html{height:100dvh;overflow:hidden;background:var(--bg)}body{min-height:100dvh;overflow:hidden;background:var(--bg)}
 body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:var(--text);font-size:14px;max-width:430px;margin:0 auto}
 /* ナビ */
 #nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:0}
@@ -247,155 +246,121 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .reload-btn.primary{background:var(--acc);color:#fff;border-color:var(--acc);}
 
 /* =====================================================
-   PWA standalone 専用CSS  (body.pwa-standalone のみ)
-   ・Safari通常表示はそのまま維持
-   ・safe-area-inset は ここで一度だけ適用（二重なし）
+   body.is-pwa のみ適用 — Safari通常表示には影響しない
+   safe-area-inset-* は このブロック内で一度だけ使用
    ===================================================== */
 
 /* --------------------------------------------------
-   レイアウト基本変数 (PWA時に上書き)
+   PWA時のビューポート確定
+   top    = safe-area-inset-top  (ノッチ/DynamicIsland)
+   bottom = ナビ高さ + safe-area-inset-bottom
    -------------------------------------------------- */
-.pwa-standalone {
-  /* ナビ高さ = アイコン+ラベル+インジケーター */
-  --navh: calc(44px + env(safe-area-inset-bottom, 0px));
+.is-pwa {
+  --_sat: env(safe-area-inset-top,    0px);
+  --_sab: env(safe-area-inset-bottom, 0px);
+  --_navh: 44px;  /* ナビアイコン領域 */
+  --_nb:   calc(var(--_navh) + var(--_sab));  /* ページbottom */
 }
 
-/* --------------------------------------------------
-   ページコンテナ: top/bottom を safe-area込みで一発確定
-   -------------------------------------------------- */
-.pwa-standalone .pg {
-  top: env(safe-area-inset-top, 0px);
-  bottom: var(--navh);
+/* ページコンテナ */
+.is-pwa .pg {
+  top:    var(--_sat);
+  bottom: var(--_nb);
 }
 
 /* --------------------------------------------------
    下部ナビ: インジケーター分だけ padding-bottom
+   padding-bottom の二重防止: #nav base は padding-bottom:0
    -------------------------------------------------- */
-.pwa-standalone #nav {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+.is-pwa #nav {
+  padding-bottom: var(--_sab);
 }
-/* ナビボタン: 高さ圧縮 */
-.pwa-standalone .nb {
+.is-pwa .nb {
   padding: 5px 4px 4px;
   font-size: 9px;
 }
-.pwa-standalone .nb i { font-size: 19px; }
+.is-pwa .nb i { font-size: 19px; }
 
 /* --------------------------------------------------
-   ヘッダー (ch): ノッチ/Dynamic Island 分だけ top padding
+   topbar (保存バッジ + 再読み込みFAB)
+   top = safe-area-top に重ねて表示
    -------------------------------------------------- */
-.pwa-standalone .ch {
-  padding-top: calc(6px + env(safe-area-inset-top, 0px));
-  padding-bottom: 6px;
+.is-pwa #pwa-topbar {
+  top:          var(--_sat);
+  padding:      3px 10px 2px;
+  padding-right: 12px;
 }
-.pwa-standalone .ch h3 { font-size: 14px; }
-.pwa-standalone .cnb   { font-size: 20px; padding: 3px 6px; }
-
-/* 設定ページのヘッダー ph */
-.pwa-standalone .ph {
-  padding: calc(8px + env(safe-area-inset-top, 0px)) 16px 8px;
-}
-.pwa-standalone .ph-title { font-size: 15px; }
+.is-pwa #save-badge  { font-size: 8px; padding: 1px 6px; }
+.is-pwa #reload-fab  { width: 24px; height: 24px; font-size: 13px; }
 
 /* --------------------------------------------------
-   topbar (保存バッジ + 再読み込み)
+   ヘッダー: safe-area-top + コンパクト化
    -------------------------------------------------- */
-.pwa-standalone #pwa-topbar {
-  top: env(safe-area-inset-top, 0px);
-  padding: 3px 10px 2px;
+.is-pwa .ch {
+  padding-top:    calc(6px + var(--_sat));
+  padding-bottom: 5px;
 }
-.pwa-standalone #save-badge {
-  font-size: 8px;
-  padding: 1px 6px;
-}
-.pwa-standalone #reload-fab {
-  width: 24px;
-  height: 24px;
-  font-size: 13px;
-}
+.is-pwa .ch h3  { font-size: 14px; }
+.is-pwa .cnb    { font-size: 20px; padding: 3px 6px; }
 
-/* --------------------------------------------------
-   月ナビ右矢印: topbar と被らない
-   -------------------------------------------------- */
-.pwa-standalone #pg-home .ch .cnb:last-child {
-  margin-right: 64px;
+/* 月ナビ右矢印 → topbarと被らない */
+.is-pwa #pg-home .ch .cnb:last-child { margin-right: 64px; }
+
+/* 設定・収入ページヘッダー */
+.is-pwa .ph {
+  padding-top:    calc(8px + var(--_sat));
+  padding-bottom: 8px;
 }
+.is-pwa .ph-title { font-size: 15px; }
 
 /* --------------------------------------------------
    今月の合計バー
    -------------------------------------------------- */
-.pwa-standalone .sh-summary {
-  padding: 5px 12px;
-}
-.pwa-standalone .sh-summary-left .lbl { font-size: 10px; }
-.pwa-standalone .sh-summary-left .sub { font-size: 9px; }
-.pwa-standalone #sh-total             { font-size: 15px; }
-.pwa-standalone #bulk-btn             { padding: 4px 8px; font-size: 10px; }
+.is-pwa .sh-summary               { padding: 5px 12px; }
+.is-pwa .sh-summary-left .lbl     { font-size: 10px; }
+.is-pwa .sh-summary-left .sub     { font-size:  9px; }
+.is-pwa #sh-total                 { font-size: 15px; }
+.is-pwa #bulk-btn                 { padding: 4px 8px; font-size: 10px; }
 
 /* --------------------------------------------------
    曜日ヘッダー行
    -------------------------------------------------- */
-.pwa-standalone .dow-c {
-  padding: 3px 0;
-  font-size: 10px;
-}
+.is-pwa .dow-c { padding: 3px 0; font-size: 10px; }
 
 /* --------------------------------------------------
-   カレンダーセル: 高さを抑えてスタンプエリアを確保
+   カレンダーセル: 高さ圧縮
    -------------------------------------------------- */
-.pwa-standalone .cd {
-  min-height: 42px;
-  padding: 1px 2px;
-}
-.pwa-standalone .dn {
-  font-size: 11px;
-  width: 20px;
-  height: 20px;
-}
-.pwa-standalone .ev {
-  font-size: 8px;
-  padding: 0 2px;
-  margin-bottom: 0;
-}
+.is-pwa .cd       { min-height: 40px; padding: 1px 2px; }
+.is-pwa .dn       { font-size: 11px; width: 20px; height: 20px; }
+.is-pwa .ev       { font-size: 8px; padding: 0 2px; margin-bottom: 0; }
 
 /* --------------------------------------------------
-   スタンプエリア
+   スタンプエリア: 高さ圧縮・2列
    -------------------------------------------------- */
-.pwa-standalone .sp-panel,
-.pwa-standalone [style*="border-top:3px solid var(--acc)"],
-.pwa-standalone [style*="border-top:3px solid var(--green)"],
-.pwa-standalone [style*="border-top:3px solid var(--purple)"] {
-  padding: 3px 10px 2px;
-}
-.pwa-standalone .sp-hd         { margin-bottom: 3px; }
-.pwa-standalone .sp-hd span    { font-size: 10px; }
-.pwa-standalone .sp-hint       { padding: 1px 0 0; font-size: 9px; }
-
-/* スタンプグリッド: 2列固定・高さ圧縮 */
-.pwa-standalone .sp-grid {
+.is-pwa .sp-panel          { padding: 3px 10px 2px; }
+.is-pwa .sp-hd             { margin-bottom: 2px; }
+.is-pwa .sp-hd span        { font-size: 10px; }
+.is-pwa .sp-hint           { padding: 1px 0 0; font-size: 9px; }
+.is-pwa .sp-grid {
   grid-template-columns: repeat(2, 1fr) !important;
   gap: 3px;
-  max-height: 64px;
+  max-height: 62px;
 }
-.pwa-standalone .stamp    { padding: 3px 4px; gap: 0; }
-.pwa-standalone .stamp .sn{ font-size: 10px; }
-.pwa-standalone .stamp .st{ font-size: 8px; }
+.is-pwa .stamp             { padding: 3px 4px; gap: 0; }
+.is-pwa .stamp .sn         { font-size: 10px; }
+.is-pwa .stamp .st         { font-size:  8px; }
 
 /* --------------------------------------------------
-   設定タブ
+   設定フォーム
    -------------------------------------------------- */
-.pwa-standalone .stab { padding: 7px 4px; font-size: 10px; }
-
-/* 設定フォーム行 */
-.pwa-standalone .ssi      { padding: 9px 14px; }
-.pwa-standalone .ssi-l    { font-size: 13px; }
-.pwa-standalone .ssi-s    { font-size: 10px; }
-.pwa-standalone .li       { padding: 8px 14px; }
-.pwa-standalone .stl      { margin-bottom: 6px; }
-
-/* スタンプリスト行 */
-.pwa-standalone .li-nm    { font-size: 12px; }
-.pwa-standalone .li-dt    { font-size: 10px; }
+.is-pwa .stab    { padding: 7px 4px; font-size: 10px; }
+.is-pwa .ssi     { padding: 9px 14px; }
+.is-pwa .ssi-l   { font-size: 13px; }
+.is-pwa .ssi-s   { font-size: 10px; }
+.is-pwa .li      { padding: 8px 14px; }
+.is-pwa .stl     { margin-bottom: 6px; }
+.is-pwa .li-nm   { font-size: 12px; }
+.is-pwa .li-dt   { font-size: 10px; }
 </style>
 </head>
 <body>
@@ -1703,19 +1668,17 @@ renderMuCards(); updShTotal(); updWkCount();
 renderShTrend();
 
 
-// ===== PWA standalone 判定: body に pwa-standalone クラスを付与 =====
+// ===== PWA standalone 判定: body に is-pwa クラスを付与 =====
 (function(){
-  var isStandalone =
-    (window.navigator.standalone === true) ||
-    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
-  if(isStandalone){
-    document.body.classList.add('pwa-standalone');
+  function check(){
+    return (window.navigator.standalone === true) ||
+           (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
   }
-  // 後から standalone になった場合も対応（念のため）
+  if(check()) document.body.classList.add('is-pwa');
+
   if(window.matchMedia){
     window.matchMedia('(display-mode: standalone)').addEventListener('change', function(e){
-      if(e.matches) document.body.classList.add('pwa-standalone');
-      else document.body.classList.remove('pwa-standalone');
+      document.body.classList.toggle('is-pwa', e.matches);
     });
   }
 })();
