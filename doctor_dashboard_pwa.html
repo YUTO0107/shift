@@ -23,7 +23,7 @@
   --green:#059669;--green-bg:#ecfdf5;
   --red:#dc2626;--orange:#d97706;
   --purple:#7c3aed;
-  --r:10px;--rs:6px;--navh:52px;
+  --r:10px;--rs:6px;--navh:48px;
   /* safe-area は body.is-pwa ブロック内で管理 */
 }
 [data-theme="dark"]{
@@ -39,7 +39,7 @@ html{background:var(--bg)}
 body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:var(--text);font-size:14px;max-width:430px;margin:0 auto}
 /* ナビ */
 #nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:0}
-.nb{flex:1;padding:8px 4px 6px;border:none;background:none;color:var(--text3);font-size:9px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .15s}
+.nb{flex:1;padding:6px 4px 4px;border:none;background:none;color:var(--text3);font-size:9px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .15s}
 .nb i{font-size:22px}
 .nb.on{color:var(--acc)}
 /* ページ */
@@ -367,6 +367,79 @@ body.is-pwa {
 .is-pwa .stl     { margin-bottom: 6px; }
 .is-pwa .li-nm   { font-size: 13px; }
 .is-pwa .li-dt   { font-size: 10px; }
+
+/* ===== Compact override — 実クラス名で !important 強制適用 ===== */
+
+/* ---- ナビ ---- */
+#nav {
+  height: var(--navh) !important;
+  padding-bottom: 0 !important;
+}
+.nb {
+  padding: 6px 4px 4px !important;
+  font-size: 9px !important;
+}
+.nb i { font-size: 20px !important; }
+
+/* ---- 月ヘッダー (.ch) ---- */
+.ch {
+  padding: 6px 16px !important;
+  min-height: unset !important;
+}
+.ch h3 { font-size: 15px !important; }
+.cnb   { font-size: 20px !important; padding: 3px 6px !important; }
+
+/* ---- 設定/収入ページヘッダー (.ph) ---- */
+.ph {
+  padding: 10px 16px !important;
+  min-height: unset !important;
+}
+.ph-title { font-size: 16px !important; }
+
+/* ---- カード ---- */
+.card {
+  margin: 0 12px 9px !important;
+}
+.card-title {
+  padding: 8px 12px 6px !important;
+  font-size: 11px !important;
+}
+.card-body { padding: 12px !important; }
+
+/* ---- stat ボックス ---- */
+.grid2 { gap: 8px !important; }
+.stat  { padding: 8px 10px !important; }
+.stat-v { font-size: 18px !important; }
+.stat-l { font-size: 11px !important; margin-bottom: 2px !important; }
+.stat-s { font-size: 10px !important; margin-top: 1px !important; }
+
+/* ---- スクロール領域 ---- */
+.scroll { padding-bottom: 10px !important; }
+
+/* ---- inline style で残っているpadding上書き ---- */
+/* シフトページ・収入ページのinline padding:14px */
+#pg-shift  .scroll > div[style*="padding:14px"],
+#pg-income .scroll > div[style*="padding:14px"] {
+  padding: 10px !important;
+}
+
+/* ---- PWA safe-area 上書き (is-pwa が付いた場合) ---- */
+.is-pwa #nav {
+  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+}
+.is-pwa .pg {
+  top:    env(safe-area-inset-top, 0px) !important;
+  bottom: calc(var(--navh) + env(safe-area-inset-bottom, 0px)) !important;
+}
+.is-pwa .ch {
+  padding-top: calc(6px + env(safe-area-inset-top, 0px)) !important;
+}
+.is-pwa .ph {
+  padding-top: calc(8px + env(safe-area-inset-top, 0px)) !important;
+}
+.is-pwa #pwa-topbar {
+  top: env(safe-area-inset-top, 0px) !important;
+}
 </style>
 </head>
 <body>
@@ -384,7 +457,7 @@ body.is-pwa {
     <h3 id="h-title" style="font-size:15px"></h3>
     <button class="cnb" id="h-next"><i class="ti ti-chevron-right"></i></button>
   </div>
-  <div class="scroll" style="padding-top:6px">
+  <div class="scroll" style="padding-top:4px">
     <div class="card">
       <div class="card-title"><i class="ti ti-currency-yen"></i>今月の収入</div>
       <div class="card-body">
