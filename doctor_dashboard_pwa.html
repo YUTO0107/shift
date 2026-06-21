@@ -23,7 +23,9 @@
   --green:#059669;--green-bg:#ecfdf5;
   --red:#dc2626;--orange:#d97706;
   --purple:#7c3aed;
-  --r:10px;--rs:6px;--navh:56px;
+  --r:10px;--rs:6px;--navh:52px;
+  --sat:env(safe-area-inset-top,0px);
+  --sab:env(safe-area-inset-bottom,0px);
 }
 [data-theme="dark"]{
   --bg:#0f1117;--bg2:#1a1d27;--bg3:#242736;
@@ -37,18 +39,18 @@
 html,body{height:100%;overflow:hidden;background:var(--bg)}
 body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:var(--text);font-size:14px;max-width:430px;margin:0 auto}
 /* ナビ */
-#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,0)}
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:var(--sab)}
 .nb{flex:1;padding:8px 4px 6px;border:none;background:none;color:var(--text3);font-size:9px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .15s}
 .nb i{font-size:22px}
 .nb.on{color:var(--acc)}
 /* ページ */
-.pg{display:none;position:fixed;top:env(safe-area-inset-top,0);left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:calc(var(--navh) + env(safe-area-inset-bottom,0));flex-direction:column;overflow:hidden;align-items:stretch}
+.pg{display:none;position:fixed;top:var(--sat);left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:calc(var(--navh) + var(--sab));flex-direction:column;overflow:hidden;align-items:stretch}
 .pg.on{display:flex}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:16px}
 /* ヘッダー */
 .ph{background:var(--bg2);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .ph-title{font-size:17px;font-weight:700}
-.ch{background:var(--bg2);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
+.ch{background:var(--bg2);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;padding-top:calc(8px + var(--sat))}
 .ch h3{font-size:16px;font-weight:600}
 .cnb{background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;padding:4px 8px}
 /* カード */
@@ -160,38 +162,122 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .nb2{background:var(--acc-bg);border-radius:var(--rs);padding:9px 12px;font-size:12px;color:var(--acc);margin-top:8px}
 
 /* ===== PWA追加CSS ===== */
-/* 保存ステータスバー */
-#save-status{
-  position:fixed;top:env(safe-area-inset-top,0);left:50%;transform:translateX(-50%);
-  width:100%;max-width:430px;z-index:300;
-  display:flex;align-items:center;justify-content:flex-end;
-  padding:3px 12px 3px;
+/* ---- ナビ: 高さ抑制 ---- */
+.nb{padding:7px 4px 5px;}
+.nb i{font-size:20px;}
+
+/* ---- 保存ステータス + ホーム再読み込みボタンエリア ---- */
+#pwa-topbar{
+  position:fixed;
+  top:var(--sat);
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:430px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:5px;
+  padding:4px 10px 2px;
+  z-index:300;
   pointer-events:none;
-  transition:opacity .3s;
 }
+/* 個別要素はpointer-events: auto で操作可能に */
 #save-badge{
-  font-size:10px;font-weight:600;
-  padding:2px 9px;border-radius:20px;
+  font-size:9px;font-weight:700;
+  padding:2px 7px;border-radius:20px;
   background:var(--green-bg);color:var(--green);
   border:1px solid var(--green);
   opacity:0;transition:opacity .4s;
   pointer-events:none;
+  white-space:nowrap;
 }
 #save-badge.saving{background:#fef3c7;color:#92400e;border-color:#d97706;opacity:1;}
 #save-badge.saved{opacity:1;}
 #save-badge.unsaved{background:#fee2e2;color:#991b1b;border-color:#dc2626;opacity:1;}
-/* 再読み込みボタン（設定画面内） */
+
+/* ---- ホーム再読み込みボタン（丸型） ---- */
+#reload-fab{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--bg2);border:1px solid var(--border2);
+  color:var(--text2);font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  pointer-events:auto;
+  flex-shrink:0;
+  box-shadow:0 1px 3px rgba(0,0,0,.12);
+  -webkit-tap-highlight-color:transparent;
+  transition:background .15s;
+}
+#reload-fab:active{background:var(--bg3);}
+
+/* ホームの月ナビ: topbarボタンと被らないよう右矢印を少し内側に */
+#pg-home .ch .cnb:last-child{
+  margin-right:68px;
+}
+
+/* ---- 今月の合計エリア: 詰まり解消 ---- */
+.sh-summary{
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:7px 12px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.sh-summary-left{flex:1;min-width:0;}
+.sh-summary-left .lbl{font-size:11px;color:var(--text2);}
+.sh-summary-left .sub{font-size:10px;color:var(--text3);}
+.sh-summary-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+#bulk-btn{
+  background:var(--acc);color:#fff;border:none;
+  border-radius:var(--rs);padding:5px 9px;
+  font-size:10px;font-weight:600;cursor:pointer;
+  white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+}
+#sh-total{font-size:17px;font-weight:700;color:var(--acc);white-space:nowrap;}
+
+/* ---- スタンプグリッド: 2列（スマホ幅） ---- */
+.sp-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:4px;
+  max-height:82px;
+  overflow-y:auto;
+}
+@media(min-width:360px){
+  .sp-grid{grid-template-columns:repeat(3,1fr);}
+}
+@media(min-width:430px){
+  .sp-grid{grid-template-columns:repeat(4,1fr);}
+}
+/* スタンプカード: 高さ抑制・文字小さく */
+.stamp{padding:4px 5px;gap:1px;}
+.stamp .sn{font-size:10px;}
+.stamp .st{font-size:8px;}
+
+/* ---- 再読み込みボタン（設定画面内） ---- */
 .reload-section{margin-bottom:14px;}
 .reload-row{display:flex;gap:8px;margin-bottom:0;}
-.reload-btn{flex:1;padding:11px 10px;border-radius:var(--rs);border:1px solid var(--border2);
-  background:var(--bg3);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;}
+.reload-btn{
+  flex:1;padding:11px 10px;border-radius:var(--rs);
+  border:1px solid var(--border2);
+  background:var(--bg3);color:var(--text);
+  font-size:12px;font-weight:600;cursor:pointer;
+}
 .reload-btn.primary{background:var(--acc);color:#fff;border-color:var(--acc);}
 </style>
 </head>
 <body>
 
-<!-- 保存ステータス -->
-<div id="save-status"><span id="save-badge">保存済み</span></div>
+<!-- PWA topbar: 保存バッジ + 再読み込みボタン -->
+<div id="pwa-topbar">
+  <span id="save-badge">保存済み</span>
+  <button id="reload-fab" onclick="reloadApp(false)" title="再読み込み">↻</button>
+</div>
 
 <!-- ホーム -->
 <div class="pg on" id="pg-home">
@@ -225,11 +311,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
     <h3 id="sh-title"></h3>
     <button class="cnb" id="sh-next"><i class="ti ti-chevron-right"></i></button>
   </div>
-  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:7px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
-    <div><div style="font-size:11px;color:var(--text2)">今月の合計</div><div style="font-size:10px;color:var(--text3)" id="sh-sub"></div></div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button id="bulk-btn" style="background:var(--acc);color:#fff;border:none;border-radius:var(--rs);padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer"><i class="ti ti-calendar-plus" style="font-size:12px;margin-right:2px"></i>一括</button>
-      <div style="font-size:18px;font-weight:700;color:var(--acc)" id="sh-total">¥0</div>
+  <div class="sh-summary">
+    <div class="sh-summary-left">
+      <div class="lbl">今月の合計</div>
+      <div class="sub" id="sh-sub"></div>
+    </div>
+    <div class="sh-summary-right">
+      <button id="bulk-btn"><i class="ti ti-calendar-plus" style="font-size:11px;margin-right:2px"></i>一括</button>
+      <div id="sh-total">¥0</div>
     </div>
   </div>
   <div class="dow" id="sh-dow" style="flex-shrink:0"></div>
@@ -543,13 +632,20 @@ var SAVE_KEY = 'doctorDashboardData_v1';
 var _saveTimer = null;
 var _isDirty = false;
 
+var _fadeTimer = null;
 function setSaveStatus(state){
   var badge = document.getElementById('save-badge');
   if(!badge) return;
-  badge.className = 'save-badge ' + state;
+  // CSSは #save-badge.saved 等のidセレクタなので className は state のみ
+  badge.className = state;
   if(state === 'saving') badge.textContent = '保存中…';
   else if(state === 'saved') badge.textContent = '保存済み';
   else if(state === 'unsaved') badge.textContent = '未保存';
+  // 「保存済み」は2秒後に自動フェードアウト
+  if(_fadeTimer) clearTimeout(_fadeTimer);
+  if(state === 'saved'){
+    _fadeTimer = setTimeout(function(){ badge.className = ''; }, 2000);
+  }
 }
 
 function save(){
@@ -1481,25 +1577,35 @@ renderShTrend();
 
 // ===== PWA: Service Worker 登録 =====
 (function(){
-  if('serviceWorker' in navigator){
-    window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./service-worker.js', {scope: './'})
-        .then(function(reg){
-          // 新バージョン検知
-          reg.addEventListener('updatefound', function(){
-            var nw = reg.installing;
-            if(nw){
-              nw.addEventListener('statechange', function(){
-                if(nw.state === 'installed' && navigator.serviceWorker.controller){
-                  // 新バージョン利用可能の通知（必要なら追加）
-                }
-              });
-            }
-          });
-        })
-        .catch(function(e){ console.warn('SW registration failed:', e); });
-    });
-  }
+  if(!('serviceWorker' in navigator)) return;
+
+  // プレビュー環境（claudeusercontent.com 等）ではSWを登録しない
+  // GitHub Pages / localhost のみ登録する
+  var host = location.hostname;
+  var allowSW = (
+    host === 'localhost' ||
+    host === '127.0.0.1' ||
+    host.endsWith('.github.io') ||
+    host.endsWith('.github.com')
+  );
+  if(!allowSW) return;
+
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./service-worker.js', {scope: './'})
+      .then(function(reg){
+        reg.addEventListener('updatefound', function(){
+          var nw = reg.installing;
+          if(nw){
+            nw.addEventListener('statechange', function(){
+              if(nw.state === 'installed' && navigator.serviceWorker.controller){
+                // 新バージョン利用可能（必要なら通知をここに追加）
+              }
+            });
+          }
+        });
+      })
+      .catch(function(e){ console.warn('SW registration failed:', e); });
+  });
 })();
 
 // ===== 初期保存ステータス表示 =====
