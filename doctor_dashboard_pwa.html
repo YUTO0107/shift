@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dr収入管理">
@@ -35,8 +35,8 @@
   --red:#f87171;--orange:#fbbf24;
   --purple:#a78bfa;
 }
-html{height:100dvh;overflow:hidden;background:var(--bg)}body{min-height:100dvh;overflow:hidden;background:var(--bg)}
-body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:var(--text);font-size:14px;max-width:430px;margin:0 auto}
+html{background:var(--bg)}
+body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:var(--text);font-size:14px;max-width:430px;margin:0 auto}
 /* ナビ */
 #nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:0}
 .nb{flex:1;padding:8px 4px 6px;border:none;background:none;color:var(--text3);font-size:9px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .15s}
@@ -247,33 +247,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 
 /* =====================================================
    body.is-pwa のみ適用 — Safari通常表示には影響しない
-   safe-area-inset-* は このブロック内で一度だけ使用
    ===================================================== */
 
-/* --------------------------------------------------
-   PWA時のビューポート確定
-   top    = safe-area-inset-top  (ノッチ/DynamicIsland)
-   bottom = ナビ高さ + safe-area-inset-bottom
-   -------------------------------------------------- */
-.is-pwa {
+/* --- iOS PWA 専用 @supports --- */
+@supports (-webkit-touch-callout: none) {
+  body.is-pwa {
+    min-height: 100dvh;
+    /* safe-area変数をここで確定 */
+    --_sat: env(safe-area-inset-top,    0px);
+    --_sab: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* --- Fallback: 非WebKit環境でも動くよう両方書く --- */
+body.is-pwa {
+  min-height: 100dvh;
   --_sat: env(safe-area-inset-top,    0px);
   --_sab: env(safe-area-inset-bottom, 0px);
-  --_navh: 44px;  /* ナビアイコン領域 */
-  --_nb:   calc(var(--_navh) + var(--_sab));  /* ページbottom */
-}
-
-/* ページコンテナ */
-.is-pwa .pg {
-  top:    var(--_sat);
-  bottom: var(--_nb);
+  /* ナビ実高さ = アイコン領域 44px + ホームインジケーター */
+  --_navh: calc(44px + var(--_sab));
 }
 
 /* --------------------------------------------------
-   下部ナビ: インジケーター分だけ padding-bottom
-   padding-bottom の二重防止: #nav base は padding-bottom:0
+   ページコンテナ: safe-area を一度だけ正確に適用
+   top    = Dynamic Island / ノッチ分
+   bottom = ナビ(44px) + ホームインジケーター
+   -------------------------------------------------- */
+.is-pwa .pg {
+  top:    var(--_sat) !important;
+  bottom: var(--_navh) !important;
+}
+
+/* --------------------------------------------------
+   下部ナビ: ホームインジケーター分だけ下げる
+   padding-bottom の二重防止: base は padding-bottom:0
    -------------------------------------------------- */
 .is-pwa #nav {
-  padding-bottom: var(--_sab);
+  padding-bottom: var(--_sab) !important;
 }
 .is-pwa .nb {
   padding: 5px 4px 4px;
@@ -283,32 +293,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 
 /* --------------------------------------------------
    topbar (保存バッジ + 再読み込みFAB)
-   top = safe-area-top に重ねて表示
    -------------------------------------------------- */
 .is-pwa #pwa-topbar {
-  top:          var(--_sat);
-  padding:      3px 10px 2px;
-  padding-right: 12px;
+  top:          var(--_sat) !important;
+  padding:      3px 12px 2px;
 }
 .is-pwa #save-badge  { font-size: 8px; padding: 1px 6px; }
 .is-pwa #reload-fab  { width: 24px; height: 24px; font-size: 13px; }
 
 /* --------------------------------------------------
-   ヘッダー: safe-area-top + コンパクト化
+   ヘッダー .ch: ノッチ/DynamicIsland 分を確保
    -------------------------------------------------- */
 .is-pwa .ch {
-  padding-top:    calc(6px + var(--_sat));
+  padding-top:    calc(6px + var(--_sat)) !important;
   padding-bottom: 5px;
 }
 .is-pwa .ch h3  { font-size: 14px; }
 .is-pwa .cnb    { font-size: 20px; padding: 3px 6px; }
-
-/* 月ナビ右矢印 → topbarと被らない */
 .is-pwa #pg-home .ch .cnb:last-child { margin-right: 64px; }
 
-/* 設定・収入ページヘッダー */
+/* 設定・収入ページヘッダー .ph */
 .is-pwa .ph {
-  padding-top:    calc(8px + var(--_sat));
+  padding-top:    calc(8px + var(--_sat)) !important;
   padding-bottom: 8px;
 }
 .is-pwa .ph-title { font-size: 15px; }
@@ -328,14 +334,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .is-pwa .dow-c { padding: 3px 0; font-size: 10px; }
 
 /* --------------------------------------------------
-   カレンダーセル: 高さ圧縮
+   カレンダーセル: PWA時は高さを抑える
    -------------------------------------------------- */
-.is-pwa .cd       { min-height: 40px; padding: 1px 2px; }
+.is-pwa .cd       { min-height: 40px !important; padding: 1px 2px; }
 .is-pwa .dn       { font-size: 11px; width: 20px; height: 20px; }
 .is-pwa .ev       { font-size: 8px; padding: 0 2px; margin-bottom: 0; }
 
 /* --------------------------------------------------
-   スタンプエリア: 高さ圧縮・2列
+   スタンプエリア: 2列・高さ圧縮
    -------------------------------------------------- */
 .is-pwa .sp-panel          { padding: 3px 10px 2px; }
 .is-pwa .sp-hd             { margin-bottom: 2px; }
