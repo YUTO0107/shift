@@ -872,6 +872,47 @@ body.is-pwa {
 .is-pwa #pwa-topbar {
   top: env(safe-area-inset-top, 0px) !important;
 }
+
+/* ===== 筋トレスタンプグリッド (押しやすい2列) ===== */
+.wk-sp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.wk-sp-grid .stamp {
+  padding: 10px 12px !important;
+  border-radius: 10px !important;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px !important;
+}
+.wk-sp-grid .stamp .sn {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+.wk-sp-grid .stamp .st {
+  font-size: 11px !important;
+  opacity: .75;
+  white-space: normal !important;
+  overflow: visible !important;
+}
+.wk-sp-grid .stamp.on {
+  outline: 2px solid var(--purple) !important;
+  outline-offset: 2px;
+}
+
+/* is-pwa: スタンプも同じサイズ維持 */
+.is-pwa .wk-sp-grid .stamp {
+  padding: 10px 12px !important;
+  min-height: 50px;
+}
+.is-pwa .wk-sp-grid .stamp .sn { font-size: 13px !important; }
+.is-pwa .wk-sp-grid .stamp .st { font-size: 10px !important; }
 </style>
 </head>
 <body>
@@ -947,32 +988,41 @@ body.is-pwa {
 
 <!-- 筋トレ -->
 <div class="pg" id="pg-workout">
+  <!-- ヘッダー: 月ナビ -->
   <div class="ch" style="flex-shrink:0">
     <button class="cnb" id="wk-prev"><i class="ti ti-chevron-left"></i></button>
     <h3 id="wk-title"></h3>
     <button class="cnb" id="wk-next"><i class="ti ti-chevron-right"></i></button>
   </div>
-  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:7px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
+  <!-- 今月カウントバー -->
+  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:6px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
     <div style="font-size:12px;color:var(--text2)">今月のトレ</div>
     <div style="text-align:right">
       <div style="font-size:18px;font-weight:700;color:var(--purple)" id="wk-count">0回</div>
       <div style="font-size:10px;color:var(--text3)" id="wk-detail"></div>
     </div>
   </div>
+  <!-- 曜日ヘッダー -->
   <div class="dow" id="wk-dow" style="flex-shrink:0"></div>
-  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;width:100%;-webkit-overflow-scrolling:touch">
+  <!-- スクロール領域: カレンダー → スタンプ → 部位の状態 -->
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;width:100%">
+    <!-- 1. カレンダー -->
     <div class="cal" id="wk-cal" style="width:100%"></div>
-    <div style="padding:14px">
+    <!-- 2. 筋トレスタンプ -->
+    <div style="background:var(--bg2);border-top:3px solid var(--purple);padding:10px 14px 8px">
+      <div class="sp-hd" style="margin-bottom:8px">
+        <span style="font-size:13px;font-weight:700;color:var(--text)"><i class="ti ti-barbell" style="font-size:14px;margin-right:5px;color:var(--purple)"></i>部位スタンプ</span>
+        <div class="sp-hint" id="wk-hint" style="font-size:11px;color:var(--text3)">部位を選択 → 日付タップで記録</div>
+      </div>
+      <div class="wk-sp-grid" id="wk-stamps"></div>
+    </div>
+    <!-- 3. 部位の状態 -->
+    <div style="padding:12px 14px 16px">
       <p class="stl" style="margin-bottom:10px">部位の状態</p>
       <div class="mu-grid" id="wk-cards"></div>
-      <p class="stl" style="margin-bottom:10px;margin-top:4px">部位別月間回数（過去6ヶ月）</p>
-      <div id="wk-trend" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px"></div>
     </div>
-    <div style="background:var(--bg2);border-top:3px solid var(--purple);padding:6px 12px 4px">
-      <div class="sp-hd"><span><i class="ti ti-barbell" style="font-size:13px;margin-right:3px"></i>部位スタンプ</span></div>
-      <div class="sp-grid" id="wk-stamps"></div>
-      <div class="sp-hint" id="wk-hint">部位を選択 → 日付タップで記録</div>
-    </div>
+    <!-- 回数推移 (非表示・ID保持) -->
+    <div id="wk-trend" style="display:none"></div>
   </div>
 </div>
 
@@ -1968,60 +2018,7 @@ function renderShTrend(){
 }
 
 function renderWkTrend(){
-  var el=g('wk-trend'); if(!el) return;
-  var now=new Date();
-  var months=[];
-  for(var i=5;i>=0;i--){
-    var d=new Date(now.getFullYear(),now.getMonth()-i,1);
-    var y=d.getFullYear(),m=d.getMonth();
-    var wks=D.workouts.filter(function(w){var wd=new Date(w.date);return wd.getFullYear()===y&&wd.getMonth()===m;});
-    var byM={};D.mkeys.forEach(function(k){byM[k]=0;});
-    wks.forEach(function(w){if(byM[w.muscle]!==undefined)byM[w.muscle]++;});
-    months.push({label:(m+1)+'月',total:wks.length,byM:byM});
-  }
-  var maxT=Math.max.apply(null,months.map(function(m){return m.total;}))||1;
-  var html='<div style="font-size:11px;color:var(--text2);margin-bottom:10px">筋トレ回数推移（過去6ヶ月）</div>';
-  // 積み上げ棒グラフ
-  html+='<div style="display:flex;align-items:flex-end;gap:6px;height:70px;margin-bottom:6px">';
-  months.forEach(function(mo){
-    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center">';
-    html+='<div style="font-size:9px;color:var(--text3);margin-bottom:2px">'+(mo.total||'')+'</div>';
-    html+='<div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:54px;gap:1px">';
-    if(mo.total===0){html+='<div style="width:100%;height:3px;background:var(--border);border-radius:2px;margin-top:auto"></div>';}
-    else{
-      D.mkeys.slice().reverse().forEach(function(k){
-        var cnt=mo.byM[k]||0; if(cnt===0) return;
-        var h=Math.max(4,Math.round(cnt/maxT*54));
-        var col=(D.muscles[k]&&D.muscles[k].color)||'#888';
-        html+='<div style="width:100%;height:'+h+'px;background:'+col+';border-radius:2px 2px 0 0;opacity:.85"></div>';
-      });
-    }
-    html+='</div></div>';
-  });
-  html+='</div>';
-  html+='<div style="display:flex;gap:6px;margin-bottom:8px">';
-  months.forEach(function(mo){html+='<div style="flex:1;text-align:center;font-size:9px;color:var(--text2)">'+mo.label+'</div>';});
-  html+='</div>';
-  // 凡例
-  html+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
-  D.mkeys.forEach(function(k){var m=D.muscles[k];if(!m)return;html+='<div style="display:flex;align-items:center;gap:3px"><div style="width:10px;height:10px;background:'+m.color+';border-radius:2px"></div><span style="font-size:10px;color:var(--text2)">'+m.label+'</span></div>';});
-  html+='</div>';
-  // 月別テーブル
-  html+='<div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px">';
-  html+='<div style="display:grid;grid-template-columns:36px repeat(6,1fr);gap:3px;font-size:10px;font-weight:600;color:var(--text3);margin-bottom:4px"><div></div>';
-  months.forEach(function(mo){html+='<div style="text-align:center">'+mo.label+'</div>';});
-  html+='</div>';
-  D.mkeys.forEach(function(k){
-    var m=D.muscles[k];if(!m)return;
-    html+='<div style="display:grid;grid-template-columns:36px repeat(6,1fr);gap:3px;font-size:11px;margin-bottom:3px">';
-    html+='<div style="font-weight:600;color:'+m.color+'">'+m.label+'</div>';
-    months.forEach(function(mo){var cnt=mo.byM[k]||0;html+='<div style="text-align:center;font-weight:600;color:'+(cnt>0?m.color:'var(--text3)')+'">'+cnt+'</div>';});
-    html+='</div>';
-  });
-  html+='<div style="display:grid;grid-template-columns:36px repeat(6,1fr);gap:3px;font-size:11px;border-top:1px solid var(--border);padding-top:3px"><div style="color:var(--text2);font-weight:700">計</div>';
-  months.forEach(function(mo){html+='<div style="text-align:center;font-weight:700;color:var(--text)">'+mo.total+'</div>';});
-  html+='</div></div>';
-  el.innerHTML=html;
+  // 回数推移は非表示（wk-trend は display:none）
 }
 
 // ========== 一括登録 ==========
