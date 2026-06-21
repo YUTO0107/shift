@@ -537,16 +537,14 @@ html.is-pwa, body.is-pwa {
 
 <!-- ホーム -->
 <div class="pg on" id="pg-home">
-  <div style="flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border)">
-    <div style="display:flex;justify-content:flex-end;padding:4px 10px 0">
-      <span id="save-badge" style="position:static;margin-right:6px">保存済み</span>
-      <button onclick="reloadApp(false)" style="width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;">↻</button>
-    </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px 6px">
-      <button class="cnb" id="h-prev"><i class="ti ti-chevron-left"></i></button>
-      <h3 id="h-title" style="font-size:15px"></h3>
-      <button class="cnb" id="h-next"><i class="ti ti-chevron-right"></i></button>
-    </div>
+  <div class="ch" style="flex-shrink:0">
+    <button class="cnb" id="h-prev"><i class="ti ti-chevron-left"></i></button>
+    <h3 id="h-title" style="font-size:15px"></h3>
+    <button class="cnb" id="h-next"><i class="ti ti-chevron-right"></i></button>
+  </div>
+  <div style="position:absolute;top:6px;right:10px;z-index:10;display:flex;align-items:center;gap:5px">
+    <span id="save-badge">保存済み</span>
+    <button onclick="reloadApp(false)" style="width:26px;height:26px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);color:var(--text2);font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.1)">↻</button>
   </div>
   <div class="scroll" style="padding-top:4px">
     <div class="card">
