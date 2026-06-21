@@ -55,6 +55,438 @@ body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background
 /* カード */
 .card{background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin:0 12px 9px;overflow:hidden}
 .card-title{padding:8px 12px 6px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.card-body{padding:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--bg3);border-radius:var(--rs);padding:10px 12px}
+.stat-l{font-size:11px;color:var(--text2);margin-bottom:3px}
+.stat-v{font-size:20px;font-weight:700}
+.stat-s{font-size:10px;color:var(--text3);margin-top:2px}
+.stat.acc{background:var(--acc-bg)}.stat.acc .stat-v{color:var(--acc)}
+.stat.grn{background:var(--green-bg)}.stat.grn .stat-v{color:var(--green)}
+/* カレンダー */
+.dow{display:grid;grid-template-columns:repeat(7,1fr);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;width:100%}
+.dow-c{text-align:center;padding:5px 0;font-size:11px;font-weight:500;color:var(--text2)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);width:100%;box-sizing:border-box}
+.cd{background:var(--bg2);min-height:52px;padding:2px 2px;cursor:pointer;position:relative}
+.cd:active{background:var(--bg3)}
+.cd.om .dn{color:var(--text3)!important}
+.cd.sun .dn{color:var(--red)}
+.cd.sat .dn{color:var(--acc)}
+.cd.sel{background:var(--acc-bg)}
+.dn{font-size:12px;font-weight:500;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin-bottom:1px}
+.dn.today{background:var(--acc);color:#fff!important;border-radius:50%}
+.ev{border-radius:3px;padding:1px 3px;font-size:9px;font-weight:700;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.ev.ft{background:#dbeafe;color:#1e40af}.ev.pt{background:#d1fae5;color:#065f46}.ev.sp{background:#fed7aa;color:#92400e}.ev.oc{background:#fee2e2;color:#991b1b}
+.ev.chest{background:#fee2e2;color:#991b1b}.ev.back{background:#dbeafe;color:#1e40af}.ev.legs{background:#d1fae5;color:#065f46}.ev.shoulder{background:#fef3c7;color:#92400e}.ev.arms{background:#f3e8ff;color:#6b21a8}
+.ev-more{font-size:9px;color:var(--text3)}
+[data-theme="dark"] .ev.ft{background:#1e3a5f;color:#93c5fd}[data-theme="dark"] .ev.pt{background:#064e3b;color:#6ee7b7}[data-theme="dark"] .ev.sp{background:#451a03;color:#fcd34d}[data-theme="dark"] .ev.oc{background:#450a0a;color:#fca5a5}
+/* スタンプ */
+.sp-panel{background:var(--bg2);border-top:3px solid var(--acc);padding:6px 12px 4px;flex-shrink:0;position:relative;z-index:10}
+.sp-panel.grn{border-top-color:var(--green)}
+.sp-panel.pu{border-top-color:var(--purple)}
+.sp-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.sp-hd span{font-size:11px;font-weight:600;color:var(--text2)}
+.sp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;max-height:90px;overflow-y:auto}
+.stamp{border:2px solid transparent;border-radius:var(--rs);padding:5px 6px;cursor:pointer;display:flex;flex-direction:column;gap:1px}
+.stamp.on{outline:2px solid var(--acc);outline-offset:1px}
+.stamp .sn{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stamp .st{font-size:9px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stamp.ft{background:#dbeafe;color:#1e40af}.stamp.pt{background:#d1fae5;color:#065f46}.stamp.sp{background:#fed7aa;color:#92400e}.stamp.oc{background:#fee2e2;color:#991b1b}
+[data-theme="dark"] .stamp.ft{background:#1e3a5f;color:#93c5fd}[data-theme="dark"] .stamp.pt{background:#064e3b;color:#6ee7b7}[data-theme="dark"] .stamp.sp{background:#451a03;color:#fcd34d}[data-theme="dark"] .stamp.oc{background:#450a0a;color:#fca5a5}
+.sp-hint{font-size:10px;color:var(--text3);text-align:center;padding:2px 0 0}
+/* 筋トレカード */
+.mu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0}
+.mu-card{background:var(--bg2);border-radius:var(--r);padding:12px;border:1px solid var(--border);border-left:4px solid var(--border);cursor:pointer}
+.mu-card:active{opacity:.7}
+.mu-name{font-size:13px;font-weight:700;margin-bottom:6px}
+.mu-days{font-size:28px;font-weight:700;line-height:1}
+.mu-unit{font-size:11px;color:var(--text2)}
+.mu-sub{font-size:10px;color:var(--text2);margin:4px 0 6px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+/* グラフ */
+.bar-chart{margin-top:4px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.bar-label{font-size:11px;color:var(--text2);width:28px;text-align:right;flex-shrink:0}
+.bar-wrap{flex:1;height:18px;background:var(--bg3);border-radius:3px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:3px;transition:width .3s}
+.bar-val{font-size:11px;font-weight:600;width:28px;text-align:right;color:var(--text);flex-shrink:0}
+/* 設定 */
+.set-tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.stab{flex:1;padding:10px 4px;border:none;background:none;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent}
+.stab.on{color:var(--acc);border-bottom-color:var(--acc)}
+.sis{background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin-bottom:14px;overflow:hidden}
+.ssi{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.ssi:last-child{border-bottom:none}
+.ssi-l{font-size:14px;font-weight:500}.ssi-s{font-size:11px;color:var(--text2);margin-top:2px}
+.li{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)}
+.li:last-child{border-bottom:none}
+.dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.li-in{flex:1}.li-nm{font-size:13px;font-weight:600}.li-dt{font-size:11px;color:var(--text2)}
+.li-ac{display:flex;gap:4px}
+.ebt{background:none;border:none;cursor:pointer;padding:6px;font-size:18px;color:var(--acc)}
+.dbt{background:none;border:none;cursor:pointer;padding:6px;font-size:18px;color:var(--red)}
+.tg{width:44px;height:26px;border-radius:13px;background:var(--border2);border:none;cursor:pointer;position:relative;flex-shrink:0}
+.tg.on{background:var(--green)}
+.tg::after{content:'';width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:left .2s}
+.tg.on::after{left:21px}
+.stl{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+/* モーダル */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.ov.on{display:flex}
+.mo{background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:430px;max-height:90vh;overflow-y:auto;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0))}
+.mh{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px}
+.mo h3{font-size:16px;font-weight:600;margin-bottom:14px}
+.mf{display:flex;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
+.btn{padding:12px 18px;border-radius:var(--rs);border:none;font-size:15px;font-weight:600;cursor:pointer;flex:1}
+.btn-p{background:var(--acc);color:#fff}.btn-d{background:var(--red);color:#fff}.btn-s{background:var(--bg3);color:var(--text)}
+.fr{margin-bottom:12px}
+.fr label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:4px}
+.fr input,.fr select,.fr textarea{width:100%;padding:11px 12px;border:1px solid var(--border2);border-radius:var(--rs);background:var(--bg);color:var(--text);font-size:16px;outline:none;-webkit-appearance:none}
+.fr input:focus{border-color:var(--acc)}
+.fr textarea{resize:none;height:60px;font-family:inherit;font-size:16px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:8px 14px;border-radius:20px;border:2px solid transparent;font-size:12px;font-weight:600;cursor:pointer}
+.chip.ft{background:#dbeafe;color:#1e40af}.chip.pt{background:#d1fae5;color:#065f46}.chip.sp{background:#fed7aa;color:#92400e}.chip.oc{background:#fee2e2;color:#991b1b}
+.chip.sel.ft{border-color:#2563eb}.chip.sel.pt{border-color:#059669}.chip.sel.sp{border-color:#d97706}.chip.sel.oc{border-color:#dc2626}
+.dr{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
+.dr:last-child{border-bottom:none}
+.dl{font-size:12px;color:var(--text2)}.dv{font-size:13px;font-weight:500}
+.dli{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
+.dli:last-child{border-bottom:none}
+.dli-l{display:flex;align-items:center;gap:8px;flex:1;cursor:pointer}
+.dli-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dli-nm{font-size:13px;font-weight:600}.dli-tm{font-size:11px;color:var(--text2)}
+.dli-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;padding:4px}
+.nb2{background:var(--acc-bg);border-radius:var(--rs);padding:9px 12px;font-size:12px;color:var(--acc);margin-top:8px}
+
+/* ===== PWA追加CSS ===== */
+/* ---- 保存ステータス + ホーム再読み込みボタンエリア ---- */
+#pwa-topbar{
+  position:fixed;
+  top:var(--sat);
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:430px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:5px;
+  padding:4px 10px 2px;
+  z-index:300;
+  pointer-events:none;
+}
+/* 個別要素はpointer-events: auto で操作可能に */
+#save-badge{
+  font-size:9px;font-weight:700;
+  padding:2px 7px;border-radius:20px;
+  background:var(--green-bg);color:var(--green);
+  border:1px solid var(--green);
+  opacity:0;transition:opacity .4s;
+  pointer-events:none;
+  white-space:nowrap;
+}
+#save-badge.saving{background:#fef3c7;color:#92400e;border-color:#d97706;opacity:1;}
+#save-badge.saved{opacity:1;}
+#save-badge.unsaved{background:#fee2e2;color:#991b1b;border-color:#dc2626;opacity:1;}
+
+/* ---- ホーム再読み込みボタン（丸型） ---- */
+#reload-fab{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--bg2);border:1px solid var(--border2);
+  color:var(--text2);font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  pointer-events:auto;
+  flex-shrink:0;
+  box-shadow:0 1px 3px rgba(0,0,0,.12);
+  -webkit-tap-highlight-color:transparent;
+  transition:background .15s;
+}
+#reload-fab:active{background:var(--bg3);}
+
+/* 月ナビ矢印調整はPWA専用ブロックに移譲 */
+
+/* ---- 今月の合計エリア: 詰まり解消 ---- */
+.sh-summary{
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:7px 12px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.sh-summary-left{flex:1;min-width:0;}
+.sh-summary-left .lbl{font-size:11px;color:var(--text2);}
+.sh-summary-left .sub{font-size:10px;color:var(--text3);}
+.sh-summary-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+#bulk-btn{
+  background:var(--acc);color:#fff;border:none;
+  border-radius:var(--rs);padding:5px 9px;
+  font-size:10px;font-weight:600;cursor:pointer;
+  white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+}
+#sh-total{font-size:17px;font-weight:700;color:var(--acc);white-space:nowrap;}
+
+/* スタンプグリッド調整はPWA専用ブロックに移譲 */
+
+/* ---- 再読み込みボタン（設定画面内） ---- */
+.reload-section{margin-bottom:14px;}
+.reload-row{display:flex;gap:8px;margin-bottom:0;}
+.reload-btn{
+  flex:1;padding:11px 10px;border-radius:var(--rs);
+  border:1px solid var(--border2);
+  background:var(--bg3);color:var(--text);
+  font-size:12px;font-weight:600;cursor:pointer;
+}
+.reload-btn.primary{background:var(--acc);color:#fff;border-color:var(--acc);}
+
+/* =====================================================
+   body.is-pwa のみ適用 — Safari通常表示には影響しない
+   ===================================================== */
+
+/* --- iOS PWA 専用 @supports --- */
+@supports (-webkit-touch-callout: none) {
+  body.is-pwa {
+    min-height: 100dvh;
+    /* safe-area変数をここで確定 */
+    --_sat: env(safe-area-inset-top,    0px);
+    --_sab: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* --- Fallback: 非WebKit環境でも動くよう両方書く --- */
+body.is-pwa {
+  min-height: 100dvh;
+  --_sat: env(safe-area-inset-top,    0px);
+  --_sab: env(safe-area-inset-bottom, 0px);
+  /* ナビ実高さ = アイコン領域 44px + ホームインジケーター */
+  --_navh: calc(44px + var(--_sab));
+}
+
+/* --------------------------------------------------
+   ページコンテナ: safe-area を一度だけ正確に適用
+   top    = Dynamic Island / ノッチ分
+   bottom = ナビ(44px) + ホームインジケーター
+   -------------------------------------------------- */
+.is-pwa .pg {
+  top:    var(--_sat) !important;
+  bottom: var(--_navh) !important;
+}
+
+/* --------------------------------------------------
+   下部ナビ: ホームインジケーター分だけ下げる
+   padding-bottom の二重防止: base は padding-bottom:0
+   -------------------------------------------------- */
+.is-pwa #nav {
+  padding-bottom: var(--_sab) !important;
+}
+.is-pwa .nb {
+  padding: 6px 4px 5px;
+  font-size: 9px;
+}
+.is-pwa .nb i { font-size: 20px; }
+
+/* --------------------------------------------------
+   topbar (保存バッジ + 再読み込みFAB)
+   -------------------------------------------------- */
+.is-pwa #pwa-topbar {
+  top:          var(--_sat) !important;
+  padding:      3px 12px 2px;
+}
+.is-pwa #save-badge  { font-size: 9px; padding: 2px 7px; }
+.is-pwa #reload-fab  { width: 26px; height: 26px; font-size: 14px; }
+
+/* --------------------------------------------------
+   ヘッダー .ch: safe-area確保のみ、padding はベース踏襲
+   -------------------------------------------------- */
+.is-pwa .ch {
+  padding-top:    calc(6px + var(--_sat)) !important;
+  padding-bottom: 6px;
+}
+.is-pwa .ch h3  { font-size: 15px; }
+.is-pwa .cnb    { font-size: 20px; padding: 3px 6px; }
+.is-pwa #pg-home .ch .cnb:last-child { margin-right: 64px; }
+
+/* 設定・収入ページヘッダー .ph */
+.is-pwa .ph {
+  padding-top:    calc(8px + var(--_sat)) !important;
+  padding-bottom: 8px;
+}
+.is-pwa .ph-title { font-size: 16px; }
+
+/* --------------------------------------------------
+   今月の合計バー
+   -------------------------------------------------- */
+.is-pwa .sh-summary               { padding: 5px 12px; }
+.is-pwa .sh-summary-left .lbl     { font-size: 11px; }
+.is-pwa .sh-summary-left .sub     { font-size:  9px; }
+.is-pwa #sh-total                 { font-size: 15px; }
+.is-pwa #bulk-btn                 { padding: 4px 8px; font-size: 10px; }
+
+/* --------------------------------------------------
+   曜日ヘッダー行
+   -------------------------------------------------- */
+.is-pwa .dow-c { padding: 4px 0; font-size: 11px; }
+
+/* --------------------------------------------------
+   カレンダーセル: PWA時は高さを抑える
+   -------------------------------------------------- */
+.is-pwa .cd       { min-height: 44px !important; padding: 2px 3px; }
+.is-pwa .dn       { font-size: 11px; width: 21px; height: 21px; }
+.is-pwa .ev       { font-size: 8px; padding: 0 2px; margin-bottom: 1px; }
+
+/* --------------------------------------------------
+   スタンプエリア: 2列
+   -------------------------------------------------- */
+.is-pwa .sp-panel          { padding: 4px 12px 3px; }
+.is-pwa .sp-hd             { margin-bottom: 3px; }
+.is-pwa .sp-hd span        { font-size: 11px; }
+.is-pwa .sp-hint           { padding: 2px 0 0; font-size: 9px; }
+.is-pwa .sp-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 4px;
+  max-height: 68px;
+}
+.is-pwa .stamp             { padding: 4px 5px; gap: 1px; }
+.is-pwa .stamp .sn         { font-size: 10px; }
+.is-pwa .stamp .st         { font-size:  9px; }
+
+/* --------------------------------------------------
+   設定フォーム
+   -------------------------------------------------- */
+.is-pwa .stab    { padding: 7px 4px; font-size: 10px; }
+.is-pwa .ssi     { padding: 10px 14px; }
+.is-pwa .ssi-l   { font-size: 13px; }
+.is-pwa .ssi-s   { font-size: 11px; }
+.is-pwa .li      { padding: 9px 14px; }
+.is-pwa .stl     { margin-bottom: 6px; }
+.is-pwa .li-nm   { font-size: 13px; }
+.is-pwa .li-dt   { font-size: 10px; }
+
+/* ===== Compact override — 外側余白のみ削減、カード内は維持 ===== */
+
+/* ---- ナビ: 実高さに合わせる ---- */
+#nav {
+  height: var(--navh) !important;
+  padding-bottom: 0 !important;
+}
+.nb {
+  padding: 6px 4px 4px !important;
+  font-size: 9px !important;
+}
+.nb i { font-size: 20px !important; }
+
+/* ---- 月ヘッダー (.ch): 上下余白を詰める ---- */
+.ch {
+  padding: 6px 16px !important;
+  min-height: unset !important;
+}
+.ch h3 { font-size: 15px !important; }
+.cnb   { font-size: 20px !important; padding: 3px 6px !important; }
+
+/* ---- 設定/収入ページヘッダー (.ph) ---- */
+.ph {
+  padding: 10px 16px !important;
+  min-height: unset !important;
+}
+.ph-title { font-size: 16px !important; }
+
+/* ---- カード外側マージンのみ詰める ---- */
+.card {
+  margin: 0 12px 10px !important;
+}
+/* card-title の上下を少しだけ詰める */
+.card-title {
+  padding: 9px 14px 7px !important;
+}
+
+/* ---- カード内部・stat・フォントはすべて元の値に戻す ---- */
+.card-body { padding: 14px !important; }
+.grid2     { gap: 10px !important; }
+.stat      { padding: 10px 12px !important; }
+.stat-v    { font-size: 20px !important; }
+.stat-l    { font-size: 11px !important; margin-bottom: 3px !important; }
+.stat-s    { font-size: 10px !important; margin-top: 2px !important; }
+
+/* ---- スクロール余白 ---- */
+.scroll { padding-bottom: 12px !important; }
+
+/* ---- PWA safe-area 上書き (is-pwa クラスがある場合) ---- */
+.is-pwa #nav {
+  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+}
+.is-pwa .pg {
+  top:    env(safe-area-inset-top, 0px) !important;
+  bottom: calc(var(--navh) + env(safe-area-inset-bottom, 0px)) !important;
+}
+.is-pwa .ch {
+  padding-top: calc(6px + env(safe-area-inset-top, 0px)) !important;
+}
+.is-pwa .ph {
+  padding-top: calc(8px + env(safe-area-inset-top, 0px)) !important;
+}
+.is-pwa #pwa-topbar {
+  top: env(safe-area-inset-top, 0px) !important;
+}
+
+="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dr収入管理">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#111827">
+<title>Dr収入管理</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.9.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#f4f6f9;--bg2:#ffffff;--bg3:#eaecf0;
+  --text:#111827;--text2:#6b7280;--text3:#9ca3af;
+  --border:#e5e7eb;--border2:#d1d5db;
+  --acc:#2563eb;--acc-bg:#eff6ff;--acc-lt:#dbeafe;
+  --green:#059669;--green-bg:#ecfdf5;
+  --red:#dc2626;--orange:#d97706;
+  --purple:#7c3aed;
+  --r:10px;--rs:6px;--navh:48px;
+  /* safe-area は body.is-pwa ブロック内で管理 */
+}
+[data-theme="dark"]{
+  --bg:#0f1117;--bg2:#1a1d27;--bg3:#242736;
+  --text:#f0f2f8;--text2:#8b93a8;--text3:#555e70;
+  --border:#2d3148;--border2:#3a3f5c;
+  --acc:#60a5fa;--acc-bg:#1e2a4a;--acc-lt:#1e3a5f;
+  --green:#34d399;--green-bg:#0d2e22;
+  --red:#f87171;--orange:#fbbf24;
+  --purple:#a78bfa;
+}
+html{background:var(--bg)}
+body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:var(--text);font-size:14px;max-width:430px;margin:0 auto}
+/* ナビ */
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:0}
+.nb{flex:1;padding:6px 4px 4px;border:none;background:none;color:var(--text3);font-size:9px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .15s}
+.nb i{font-size:22px}
+.nb.on{color:var(--acc)}
+/* ページ */
+.pg{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:var(--navh);flex-direction:column;overflow:hidden;align-items:stretch}
+.pg.on{display:flex}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:10px}
+/* ヘッダー */
+.ph{background:var(--bg2);padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ph-title{font-size:16px;font-weight:700}
+.ch{background:var(--bg2);padding:6px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
+.ch h3{font-size:15px;font-weight:600}
+.cnb{background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;padding:4px 8px}
+/* カード */
+.card{background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin:0 12px 9px;overflow:hidden}
+.card-title{padding:8px 12px 6px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
 .card-body{padding:12px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .stat{background:var(--bg3);border-radius:var(--rs);padding:8px 10px}
