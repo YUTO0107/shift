@@ -920,10 +920,8 @@ body.is-pwa {
 /* ===== 勤務スタンプグリッド (2列・押しやすい) ===== */
 .sh-sp-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4列で2行に収める */
+  grid-template-columns: repeat(4, 1fr);
   gap: 5px;
-  max-height: 100px;
-  overflow-y: auto;
 }
 .sh-sp-grid .stamp {
   padding: 7px 6px !important;
@@ -1022,7 +1020,7 @@ body.is-pwa {
   <div class="dow" id="sh-dow" style="flex-shrink:0"></div>
   <!-- スクロールコンテナ: カレンダー(大) → スタンプ -->
   <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0">
-    <div class="cal" id="sh-cal" style="min-height:55vh;align-content:stretch"></div>
+    <div class="cal" id="sh-cal" style="min-height:45vh;align-content:stretch"></div>
     <!-- スタンプパネル -->
     <div style="background:var(--bg2);border-top:3px solid var(--acc);padding:8px 12px 6px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -1060,7 +1058,7 @@ body.is-pwa {
   <!-- スクロールコンテナ: カレンダー(大) → スタンプ → 部位の状態 -->
   <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0">
     <!-- カレンダー: min-height で画面の大部分を占有 -->
-    <div class="cal" id="wk-cal" style="min-height:55vh;align-content:stretch"></div>
+    <div class="cal" id="wk-cal" style="min-height:45vh;align-content:stretch"></div>
     <!-- スタンプパネル -->
     <div style="background:var(--bg2);border-top:3px solid var(--purple);padding:8px 12px 6px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
