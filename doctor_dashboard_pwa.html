@@ -254,7 +254,7 @@ body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background
 
 /* --- iOS PWA 専用 @supports --- */
 @supports (-webkit-touch-callout: none) {
-  body.is-pwa {
+  html.is-pwa, body.is-pwa {
     min-height: 100dvh;
     /* safe-area変数をここで確定 */
     --_sat: env(safe-area-inset-top,    0px);
@@ -263,7 +263,7 @@ body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background
 }
 
 /* --- Fallback: 非WebKit環境でも動くよう両方書く --- */
-body.is-pwa {
+html.is-pwa, body.is-pwa {
   min-height: 100dvh;
   --_sat: env(safe-area-inset-top,    0px);
   --_sab: env(safe-area-inset-bottom, 0px);
@@ -535,6 +535,15 @@ body.is-pwa {
 .is-pwa .sh-sp-grid .stamp .sn { font-size: 13px !important; }
 .is-pwa .sh-sp-grid .stamp .st { font-size: 10px !important; }
 </style>
+<script>
+// PWA判定を描画前に実行してFOUCを防ぐ
+(function(){
+  if(window.navigator.standalone===true ||
+     (window.matchMedia && window.matchMedia('(display-mode:standalone)').matches)){
+    document.documentElement.classList.add('is-pwa');
+  }
+})();
+</script>
 </head>
 <body>
 
@@ -589,7 +598,7 @@ body.is-pwa {
   <div class="dow" id="sh-dow" style="flex-shrink:0"></div>
   <!-- スクロールコンテナ: カレンダー(大) → スタンプ -->
   <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0">
-    <div class="cal" id="sh-cal" style="min-height:45vh;align-content:stretch"></div>
+    <div class="cal" id="sh-cal" style="min-height:35vh;max-height:40vh;align-content:stretch"></div>
     <!-- スタンプパネル -->
     <div style="background:var(--bg2);border-top:3px solid var(--acc);padding:8px 12px 6px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -627,7 +636,7 @@ body.is-pwa {
   <!-- スクロールコンテナ: カレンダー(大) → スタンプ → 部位の状態 -->
   <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0">
     <!-- カレンダー: min-height で画面の大部分を占有 -->
-    <div class="cal" id="wk-cal" style="min-height:45vh;align-content:stretch"></div>
+    <div class="cal" id="wk-cal" style="min-height:35vh;max-height:40vh;align-content:stretch"></div>
     <!-- スタンプパネル -->
     <div style="background:var(--bg2);border-top:3px solid var(--purple);padding:8px 12px 6px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -1770,16 +1779,19 @@ renderMuCards(); updShTotal(); updWkCount();
 renderShTrend();
 
 
-// ===== PWA standalone 判定: body に is-pwa クラスを付与 =====
+// ===== PWA standalone 判定: html/body 両方に is-pwa クラスを付与 =====
 (function(){
   function check(){
     return (window.navigator.standalone === true) ||
            (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
   }
-  if(check()) document.body.classList.add('is-pwa');
-
+  if(check()){
+    document.documentElement.classList.add('is-pwa');
+    document.body.classList.add('is-pwa');
+  }
   if(window.matchMedia){
     window.matchMedia('(display-mode: standalone)').addEventListener('change', function(e){
+      document.documentElement.classList.toggle('is-pwa', e.matches);
       document.body.classList.toggle('is-pwa', e.matches);
     });
   }
