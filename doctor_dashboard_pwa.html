@@ -46,7 +46,7 @@ body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background
 .nb i{font-size:22px}
 .nb.on{color:var(--acc)}
 /* ページ */
-.pg{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:var(--navh);flex-direction:column;overflow:hidden;align-items:stretch}
+.pg{display:none;position:fixed;top:0!important;left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:var(--navh);flex-direction:column;overflow:hidden;align-items:stretch}
 .pg.on{display:flex}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:10px}
 /* ヘッダー */
@@ -263,7 +263,7 @@ html.is-pwa, body.is-pwa {
    bottom = ナビ(44px) + ホームインジケーター
    -------------------------------------------------- */
 .is-pwa .pg {
-  top:    var(--_sat) !important;
+  top:    0px !important;
   bottom: var(--_navh) !important;
 }
 
