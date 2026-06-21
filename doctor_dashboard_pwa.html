@@ -66,8 +66,8 @@ body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background
 /* カレンダー */
 .dow{display:grid;grid-template-columns:repeat(7,1fr);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;width:100%}
 .dow-c{text-align:center;padding:5px 0;font-size:11px;font-weight:500;color:var(--text2)}
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);width:100%;box-sizing:border-box}
-.cd{background:var(--bg2);min-height:52px;padding:2px 2px;cursor:pointer;position:relative}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);width:100%;box-sizing:border-box;align-content:stretch}
+.cd{background:var(--bg2);min-height:0;height:100%;padding:2px 2px;cursor:pointer;position:relative}
 .cd:active{background:var(--bg3)}
 .cd.om .dn{color:var(--text3)!important}
 .cd.sun .dn{color:var(--red)}
@@ -876,94 +876,97 @@ body.is-pwa {
 /* ===== 筋トレスタンプグリッド (押しやすい2列) ===== */
 .wk-sp-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr); /* 4列で2行に収める */
+  gap: 5px;
+  max-height: 100px;
+  overflow-y: auto;
 }
 .wk-sp-grid .stamp {
-  padding: 10px 12px !important;
-  border-radius: 10px !important;
-  min-height: 52px;
+  padding: 7px 6px !important;
+  border-radius: 8px !important;
+  min-height: 44px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 3px !important;
+  align-items: flex-start;
+  gap: 2px !important;
 }
 .wk-sp-grid .stamp .sn {
-  font-size: 14px !important;
+  font-size: 11px !important;
   font-weight: 700 !important;
-  white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: unset !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  width: 100%;
 }
 .wk-sp-grid .stamp .st {
-  font-size: 11px !important;
+  font-size: 9px !important;
   opacity: .75;
-  white-space: normal !important;
-  overflow: visible !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
 }
 .wk-sp-grid .stamp.on {
   outline: 2px solid var(--purple) !important;
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
-
-/* is-pwa: スタンプも同じサイズ維持 */
+/* is-pwa: 同サイズ維持 */
 .is-pwa .wk-sp-grid .stamp {
-  padding: 10px 12px !important;
-  min-height: 50px;
+  padding: 7px 6px !important;
+  min-height: 42px;
 }
-.is-pwa .wk-sp-grid .stamp .sn { font-size: 13px !important; }
-.is-pwa .wk-sp-grid .stamp .st { font-size: 10px !important; }
+.is-pwa .wk-sp-grid .stamp .sn { font-size: 11px !important; }
+.is-pwa .wk-sp-grid .stamp .st { font-size:  9px !important; }
 
 /* ===== 勤務スタンプグリッド (2列・押しやすい) ===== */
 .sh-sp-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr); /* 4列で2行に収める */
+  gap: 5px;
+  max-height: 100px;
+  overflow-y: auto;
 }
 .sh-sp-grid .stamp {
-  padding: 10px 12px !important;
-  border-radius: 10px !important;
-  min-height: 52px;
+  padding: 7px 6px !important;
+  border-radius: 8px !important;
+  min-height: 44px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 3px !important;
+  align-items: flex-start;
+  gap: 2px !important;
 }
 .sh-sp-grid .stamp .sn {
-  font-size: 14px !important;
+  font-size: 11px !important;
   font-weight: 700 !important;
-  white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: unset !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  width: 100%;
 }
 .sh-sp-grid .stamp .st {
-  font-size: 11px !important;
+  font-size: 9px !important;
   opacity: .75;
-  white-space: normal !important;
-  overflow: visible !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
 }
 .sh-sp-grid .stamp.on {
   outline: 2px solid var(--acc) !important;
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
 
-/* ===== カレンダーセル: 勤務・筋トレタブで少し大きく ===== */
+/* ===== カレンダーセル: flex:1ラッパー内で高さを均等に伸ばす ===== */
 #pg-shift  .cd,
 #pg-workout .cd {
-  min-height: 58px !important;
+  min-height: 0;        /* grid の align-content:stretch に任せる */
+  height: 100%;
 }
-
-/* is-pwa でも同サイズ維持 */
+/* is-pwa: スタンプサイズ維持 */
 .is-pwa .sh-sp-grid .stamp {
   padding: 10px 12px !important;
-  min-height: 50px;
+  min-height: 48px;
 }
 .is-pwa .sh-sp-grid .stamp .sn { font-size: 13px !important; }
 .is-pwa .sh-sp-grid .stamp .st { font-size: 10px !important; }
-.is-pwa #pg-shift  .cd,
-.is-pwa #pg-workout .cd {
-  min-height: 54px !important;
-}
 </style>
 </head>
 <body>
@@ -1017,24 +1020,24 @@ body.is-pwa {
     </div>
   </div>
   <div class="dow" id="sh-dow" style="flex-shrink:0"></div>
-  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;width:100%;padding-top:0">
-    <div class="cal" id="sh-cal" style="width:100%"></div>
-    <!-- 勤務スタンプ (2列・大きめ) -->
-    <div style="background:var(--bg2);border-top:3px solid var(--acc);padding:10px 14px 8px">
-      <div class="sp-hd" style="margin-bottom:8px">
-        <span style="font-size:13px;font-weight:700;color:var(--text)"><i class="ti ti-stamp" style="font-size:14px;margin-right:5px;color:var(--acc)"></i>スタンプ</span>
-        <div style="display:flex;gap:6px;align-items:center">
-          <span id="multi-cnt" style="font-size:11px;color:var(--acc);display:none"></span>
-          <button id="sh-st-add" style="background:none;border:1px solid var(--border2);border-radius:var(--rs);padding:4px 10px;font-size:11px;color:var(--text2);cursor:pointer">+ 追加</button>
-        </div>
+  <!-- スクロールコンテナ: カレンダー(大) → スタンプ -->
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0">
+    <div class="cal" id="sh-cal" style="min-height:55vh;align-content:stretch"></div>
+    <!-- スタンプパネル -->
+    <div style="background:var(--bg2);border-top:3px solid var(--acc);padding:8px 12px 6px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <span style="font-size:12px;font-weight:700;color:var(--text)"><i class="ti ti-stamp" style="font-size:13px;margin-right:4px;color:var(--acc)"></i>スタンプ</span>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span id="multi-cnt" style="font-size:11px;color:var(--acc);display:none"></span>
+        <button id="sh-st-add" style="background:none;border:1px solid var(--border2);border-radius:var(--rs);padding:3px 8px;font-size:11px;color:var(--text2);cursor:pointer">+ 追加</button>
       </div>
-      <div class="sh-sp-grid" id="sh-stamps"></div>
-      <div class="sp-hint" id="sh-hint" style="padding:4px 0 0;font-size:11px">スタンプ選択 → 日付タップで登録</div>
     </div>
-    <!-- 推移 (非表示・ID保持) -->
+    <div class="sh-sp-grid" id="sh-stamps"></div>
+    <div id="sh-hint" style="font-size:10px;color:var(--text3);text-align:center;padding:3px 0 0">スタンプ選択 → 日付タップで登録</div>
+    </div><!-- /スタンプパネル -->
     <div id="sh-trend" style="display:none"></div>
-  </div>
-</div>
+  </div><!-- /スクロールコンテナ -->
+</div><!-- /pg-shift -->
 
 <!-- 筋トレ -->
 <div class="pg" id="pg-workout">
@@ -1054,26 +1057,25 @@ body.is-pwa {
   </div>
   <!-- 曜日ヘッダー -->
   <div class="dow" id="wk-dow" style="flex-shrink:0"></div>
-  <!-- スクロール領域: カレンダー → スタンプ → 部位の状態 -->
-  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;width:100%">
-    <!-- 1. カレンダー -->
-    <div class="cal" id="wk-cal" style="width:100%"></div>
-    <!-- 2. 筋トレスタンプ -->
-    <div style="background:var(--bg2);border-top:3px solid var(--purple);padding:10px 14px 8px">
-      <div class="sp-hd" style="margin-bottom:8px">
-        <span style="font-size:13px;font-weight:700;color:var(--text)"><i class="ti ti-barbell" style="font-size:14px;margin-right:5px;color:var(--purple)"></i>部位スタンプ</span>
-        <div class="sp-hint" id="wk-hint" style="font-size:11px;color:var(--text3)">部位を選択 → 日付タップで記録</div>
+  <!-- スクロールコンテナ: カレンダー(大) → スタンプ → 部位の状態 -->
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0">
+    <!-- カレンダー: min-height で画面の大部分を占有 -->
+    <div class="cal" id="wk-cal" style="min-height:55vh;align-content:stretch"></div>
+    <!-- スタンプパネル -->
+    <div style="background:var(--bg2);border-top:3px solid var(--purple);padding:8px 12px 6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:12px;font-weight:700;color:var(--text)"><i class="ti ti-barbell" style="font-size:13px;margin-right:4px;color:var(--purple)"></i>部位スタンプ</span>
+        <div id="wk-hint" style="font-size:10px;color:var(--text3)">部位選択 → 日付タップで記録</div>
       </div>
       <div class="wk-sp-grid" id="wk-stamps"></div>
     </div>
-    <!-- 3. 部位の状態 -->
-    <div style="padding:12px 14px 16px">
-      <p class="stl" style="margin-bottom:10px">部位の状態</p>
+    <!-- 部位の状態: 下スクロールで表示 -->
+    <div style="padding:10px 12px 16px;background:var(--bg)">
+      <p class="stl" style="margin-bottom:8px;font-size:11px">部位の状態</p>
       <div class="mu-grid" id="wk-cards"></div>
     </div>
-    <!-- 回数推移 (非表示・ID保持) -->
-    <div id="wk-trend" style="display:none"></div>
   </div>
+  <div id="wk-trend" style="display:none"></div>
 </div>
 
 <!-- 設定 -->
