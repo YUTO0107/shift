@@ -45,21 +45,21 @@ body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background
 /* ページ */
 .pg{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:var(--navh);flex-direction:column;overflow:hidden;align-items:stretch}
 .pg.on{display:flex}
-.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:20px}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:10px}
 /* ヘッダー */
-.ph{background:var(--bg2);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.ph-title{font-size:17px;font-weight:700}
-.ch{background:var(--bg2);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
-.ch h3{font-size:16px;font-weight:600}
+.ph{background:var(--bg2);padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ph-title{font-size:16px;font-weight:700}
+.ch{background:var(--bg2);padding:6px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
+.ch h3{font-size:15px;font-weight:600}
 .cnb{background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;padding:4px 8px}
 /* カード */
-.card{background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin:0 14px 14px;overflow:hidden}
-.card-title{padding:11px 14px 9px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
-.card-body{padding:16px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:var(--bg3);border-radius:var(--rs);padding:11px 13px}
+.card{background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin:0 12px 9px;overflow:hidden}
+.card-title{padding:8px 12px 6px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.card-body{padding:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--bg3);border-radius:var(--rs);padding:8px 10px}
 .stat-l{font-size:11px;color:var(--text2);margin-bottom:3px}
-.stat-v{font-size:20px;font-weight:700}
+.stat-v{font-size:18px;font-weight:700}
 .stat-s{font-size:10px;color:var(--text3);margin-top:2px}
 .stat.acc{background:var(--acc-bg)}.stat.acc .stat-v{color:var(--acc)}
 .stat.grn{background:var(--green-bg)}.stat.grn .stat-v{color:var(--green)}
@@ -296,37 +296,37 @@ body.is-pwa {
    -------------------------------------------------- */
 .is-pwa #pwa-topbar {
   top:          var(--_sat) !important;
-  padding:      4px 12px 3px;
+  padding:      3px 12px 2px;
 }
 .is-pwa #save-badge  { font-size: 9px; padding: 2px 7px; }
 .is-pwa #reload-fab  { width: 26px; height: 26px; font-size: 14px; }
 
 /* --------------------------------------------------
-   ヘッダー .ch: ゆとり増し (+2px、SAT は維持)
+   ヘッダー .ch: safe-area確保のみ、padding はベース踏襲
    -------------------------------------------------- */
 .is-pwa .ch {
-  padding-top:    calc(8px + var(--_sat)) !important;
-  padding-bottom: 7px;
+  padding-top:    calc(6px + var(--_sat)) !important;
+  padding-bottom: 6px;
 }
 .is-pwa .ch h3  { font-size: 15px; }
-.is-pwa .cnb    { font-size: 21px; padding: 4px 7px; }
+.is-pwa .cnb    { font-size: 20px; padding: 3px 6px; }
 .is-pwa #pg-home .ch .cnb:last-child { margin-right: 64px; }
 
 /* 設定・収入ページヘッダー .ph */
 .is-pwa .ph {
-  padding-top:    calc(10px + var(--_sat)) !important;
-  padding-bottom: 10px;
+  padding-top:    calc(8px + var(--_sat)) !important;
+  padding-bottom: 8px;
 }
 .is-pwa .ph-title { font-size: 16px; }
 
 /* --------------------------------------------------
    今月の合計バー
    -------------------------------------------------- */
-.is-pwa .sh-summary               { padding: 6px 14px; }
+.is-pwa .sh-summary               { padding: 5px 12px; }
 .is-pwa .sh-summary-left .lbl     { font-size: 11px; }
 .is-pwa .sh-summary-left .sub     { font-size:  9px; }
-.is-pwa #sh-total                 { font-size: 16px; }
-.is-pwa #bulk-btn                 { padding: 5px 9px; font-size: 10px; }
+.is-pwa #sh-total                 { font-size: 15px; }
+.is-pwa #bulk-btn                 { padding: 4px 8px; font-size: 10px; }
 
 /* --------------------------------------------------
    曜日ヘッダー行
@@ -334,14 +334,14 @@ body.is-pwa {
 .is-pwa .dow-c { padding: 4px 0; font-size: 11px; }
 
 /* --------------------------------------------------
-   カレンダーセル: 40px → 44px (+10%)
+   カレンダーセル: PWA時は高さを抑える
    -------------------------------------------------- */
 .is-pwa .cd       { min-height: 44px !important; padding: 2px 3px; }
 .is-pwa .dn       { font-size: 11px; width: 21px; height: 21px; }
 .is-pwa .ev       { font-size: 8px; padding: 0 2px; margin-bottom: 1px; }
 
 /* --------------------------------------------------
-   スタンプエリア: 2列・ほどよい余白
+   スタンプエリア: 2列
    -------------------------------------------------- */
 .is-pwa .sp-panel          { padding: 4px 12px 3px; }
 .is-pwa .sp-hd             { margin-bottom: 3px; }
@@ -359,12 +359,12 @@ body.is-pwa {
 /* --------------------------------------------------
    設定フォーム
    -------------------------------------------------- */
-.is-pwa .stab    { padding: 8px 4px; font-size: 10px; }
-.is-pwa .ssi     { padding: 11px 16px; }
+.is-pwa .stab    { padding: 7px 4px; font-size: 10px; }
+.is-pwa .ssi     { padding: 10px 14px; }
 .is-pwa .ssi-l   { font-size: 13px; }
 .is-pwa .ssi-s   { font-size: 11px; }
-.is-pwa .li      { padding: 10px 16px; }
-.is-pwa .stl     { margin-bottom: 7px; }
+.is-pwa .li      { padding: 9px 14px; }
+.is-pwa .stl     { margin-bottom: 6px; }
 .is-pwa .li-nm   { font-size: 13px; }
 .is-pwa .li-dt   { font-size: 10px; }
 </style>
@@ -384,7 +384,7 @@ body.is-pwa {
     <h3 id="h-title" style="font-size:15px"></h3>
     <button class="cnb" id="h-next"><i class="ti ti-chevron-right"></i></button>
   </div>
-  <div class="scroll" style="padding-top:14px">
+  <div class="scroll" style="padding-top:6px">
     <div class="card">
       <div class="card-title"><i class="ti ti-currency-yen"></i>今月の収入</div>
       <div class="card-body">
@@ -420,7 +420,7 @@ body.is-pwa {
     </div>
   </div>
   <div class="dow" id="sh-dow" style="flex-shrink:0"></div>
-  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;width:100%">
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;width:100%;padding-top:0">
     <div class="cal" id="sh-cal" style="width:100%"></div>
     <div style="background:var(--bg2);border-top:3px solid var(--acc);padding:6px 12px 4px">
       <div class="sp-hd">
