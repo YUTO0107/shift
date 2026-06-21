@@ -533,16 +533,18 @@ html.is-pwa, body.is-pwa {
 </head>
 <body>
 
-<!-- pwa-topbar は .ch 内に統合済み -->
+
 
 <!-- ホーム -->
 <div class="pg on" id="pg-home">
-  <div class="ch" style="flex-shrink:0">
-    <button class="cnb" id="h-prev"><i class="ti ti-chevron-left"></i></button>
-    <h3 id="h-title" style="font-size:15px"></h3>
-    <div style="display:flex;align-items:center;gap:5px">
-      <span id="save-badge">保存済み</span>
-      <button id="reload-fab" onclick="reloadApp(false)" title="再読み込み">↻</button>
+  <div style="flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border)">
+    <div style="display:flex;justify-content:flex-end;padding:4px 10px 0">
+      <span id="save-badge" style="position:static;margin-right:6px">保存済み</span>
+      <button onclick="reloadApp(false)" style="width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;">↻</button>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px 6px">
+      <button class="cnb" id="h-prev"><i class="ti ti-chevron-left"></i></button>
+      <h3 id="h-title" style="font-size:15px"></h3>
       <button class="cnb" id="h-next"><i class="ti ti-chevron-right"></i></button>
     </div>
   </div>
@@ -569,10 +571,7 @@ html.is-pwa, body.is-pwa {
   <div class="ch" style="flex-shrink:0">
     <button class="cnb" id="sh-prev"><i class="ti ti-chevron-left"></i></button>
     <h3 id="sh-title"></h3>
-    <div style="display:flex;align-items:center;gap:4px">
-      <button id="reload-fab-sh-prev" onclick="reloadApp(false)" title="再読み込み" style="width:26px;height:26px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;">↻</button>
-      <button class="cnb" id="sh-next"><i class="ti ti-chevron-right"></i></button>
-    </div>
+    <button class="cnb" id="sh-next"><i class="ti ti-chevron-right"></i></button>
   </div>
   <div class="sh-summary">
     <div class="sh-summary-left">
@@ -610,10 +609,7 @@ html.is-pwa, body.is-pwa {
   <div class="ch" style="flex-shrink:0">
     <button class="cnb" id="wk-prev"><i class="ti ti-chevron-left"></i></button>
     <h3 id="wk-title"></h3>
-    <div style="display:flex;align-items:center;gap:4px">
-      <button id="reload-fab-wk-prev" onclick="reloadApp(false)" title="再読み込み" style="width:26px;height:26px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;">↻</button>
-      <button class="cnb" id="wk-next"><i class="ti ti-chevron-right"></i></button>
-    </div>
+    <button class="cnb" id="wk-next"><i class="ti ti-chevron-right"></i></button>
   </div>
   <!-- 今月カウントバー -->
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:6px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
