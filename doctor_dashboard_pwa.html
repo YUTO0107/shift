@@ -373,11 +373,8 @@ body.is-pwa {
 
 /* ---- reload-circle ---- */
 .reload-circle {
-  position: absolute !important;
-  right: 12px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  width: 36px !important; height: 36px !important;
+  width: 44px !important;
+  height: 44px !important;
   border-radius: 50% !important;
   background: var(--bg3) !important;
   border: 1px solid var(--border2) !important;
@@ -387,6 +384,7 @@ body.is-pwa {
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
+  flex-shrink: 0 !important;
 }
 
 
@@ -516,13 +514,13 @@ body { font-size: 16px !important; }
 <!-- PWA topbar: 保存バッジ + 再読み込みボタン -->
 <div id="pwa-topbar">
   <span id="save-badge">保存済み</span>
-  <button id="reload-fab" onclick="reloadApp(false)" title="再読み込み">↻</button>
 </div>
 
 <!-- ホーム -->
 <div class="pg on" id="pg-home">
-  <div class="ch" style="flex-shrink:0;position:relative">
-    <h3 id="h-title" style="text-align:center;width:100%"></h3>
+  <div class="ch" style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
+    <div style="width:44px"></div>
+    <h3 id="h-title" style="flex:1;text-align:center"></h3>
     <button onclick="reloadApp(false)" class="reload-circle">↻</button>
   </div>
   <div class="scroll" style="padding-top:4px">
@@ -545,13 +543,14 @@ body { font-size: 16px !important; }
 
 <!-- 勤務 -->
 <div class="pg" id="pg-shift">
-  <div class="ch" style="flex-shrink:0;position:relative">
-    <h3 id="sh-title" style="text-align:center;width:100%"></h3>
+  <div class="ch" style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
+    <div style="width:44px"></div>
+    <h3 id="sh-title" style="flex:1;text-align:center"></h3>
     <button onclick="reloadApp(false)" class="reload-circle">↻</button>
   </div>
   <div class="sh-summary">
     <div class="sh-summary-left">
-      <div class="lbl">今月の合計</div>
+      <div class="lbl" id="sh-month-lbl">合計</div>
       <div class="sub" id="sh-sub"></div>
     </div>
     <div class="sh-summary-right">
@@ -582,13 +581,14 @@ body { font-size: 16px !important; }
 <!-- 筋トレ -->
 <div class="pg" id="pg-workout">
   <!-- ヘッダー: 月タイトル + 更新 -->
-  <div class="ch" style="flex-shrink:0;position:relative">
-    <h3 id="wk-title" style="text-align:center;width:100%"></h3>
+  <div class="ch" style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
+    <div style="width:44px"></div>
+    <h3 id="wk-title" style="flex:1;text-align:center"></h3>
     <button onclick="reloadApp(false)" class="reload-circle">↻</button>
   </div>
   <!-- 今月カウントバー -->
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:6px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
-    <div style="font-size:12px;color:var(--text2)">今月のトレ</div>
+    <div style="font-size:12px;color:var(--text2)" id="wk-month-lbl">トレーニング</div>
     <div style="text-align:right">
       <div style="font-size:18px;font-weight:700;color:var(--purple)" id="wk-count">0回</div>
       <div style="font-size:10px;color:var(--text3)" id="wk-detail"></div>
@@ -1024,6 +1024,12 @@ function renderCal(mode){
   var c=CAL[mode],y=Math.floor(c/12),m=c%12;
   var titleEl=g(mode+'-title');
   if(titleEl) titleEl.textContent=ymLabel(c);
+  // サマリーラベルも月名で更新
+  var mname = (c%12+1)+'月';
+  var shLbl = g('sh-month-lbl');
+  if(shLbl && mode==='shift') shLbl.textContent = mname+'の合計';
+  var wkLbl = g('wk-month-lbl');
+  if(wkLbl && mode==='workout') wkLbl.textContent = mname+'のトレーニング';
   var mon=D.settings.startMonday!==false;
   var dowEl=g(mode+'-dow');
   if(dowEl){
@@ -1906,6 +1912,21 @@ renderShTrend();
     addSwipe('h-cal',
       function(){ var b=document.getElementById('h-prev'); if(b) b.click(); },
       function(){ var b=document.getElementById('h-next'); if(b) b.click(); }
+    );
+    // ホームページ全体もスワイプ対応
+    addSwipe('pg-home',
+      function(){ var b=document.getElementById('h-prev'); if(b) b.click(); },
+      function(){ var b=document.getElementById('h-next'); if(b) b.click(); }
+    );
+    // 勤務ページ全体もスワイプ対応
+    addSwipe('pg-shift',
+      function(){ var b=document.getElementById('sh-prev'); if(b) b.click(); },
+      function(){ var b=document.getElementById('sh-next'); if(b) b.click(); }
+    );
+    // 筋トレページ全体もスワイプ対応
+    addSwipe('pg-workout',
+      function(){ var b=document.getElementById('wk-prev'); if(b) b.click(); },
+      function(){ var b=document.getElementById('wk-next'); if(b) b.click(); }
     );
   });
 })();
