@@ -1344,7 +1344,6 @@ function renderWkStamps(){
 function selWkM(k){aWkM=(aWkM===k)?null:k;g('wk-hint').textContent=aWkM?'日付をタップして記録':'部位を選択 → 日付タップで記録';renderWkStamps();}
 function addWk(ds,muscle){
   var now=new Date(); now.setHours(0,0,0,0);
-  if(new Date(ds)>now){alert('未来の日付には記録できません');return;}
   if(D.workouts.some(function(w){return w.date===ds&&w.muscle===muscle;})){alert((D.muscles[muscle]?D.muscles[muscle].label:muscle)+'は既に記録済みです');return;}
   D.workouts.push({id:'wk'+Date.now()+Math.random().toString(36).slice(2),date:ds,muscle:muscle,memo:''});
   save(); renderCal('wk'); renderMuCards(); updWkCount(); renderHome();
@@ -1390,7 +1389,7 @@ function renderMuCards(){
   var today=new Date(); today.setHours(0,0,0,0);
   D.mkeys.forEach(function(k){
     var m=D.muscles[k]; if(!m) return;
-    var recs=D.workouts.filter(function(w){return w.muscle===k&&new Date(w.date)<=today;}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    var recs=D.workouts.filter(function(w){return w.muscle===k;}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});
     var last=recs[0],days=null,lastStr='';
     if(last){var ld=new Date(last.date);ld.setHours(0,0,0,0);days=Math.floor((today-ld)/(1000*60*60*24));var ld2=new Date(last.date);lastStr=(ld2.getMonth()+1)+'/'+ld2.getDate()+'('+['日','月','火','水','木','金','土'][ld2.getDay()]+')';}
     var st=getMuSt(days);
@@ -1526,7 +1525,7 @@ function renderHome(){
   var nextMu=null,maxDays=-1;
   D.mkeys.forEach(function(k){
     var mu=D.muscles[k]; if(!mu) return;
-    var recs=D.workouts.filter(function(w){return w.muscle===k&&new Date(w.date)<=today2;}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    var recs=D.workouts.filter(function(w){return w.muscle===k;}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});
     var d=recs[0]?Math.floor((today2-new Date(recs[0].date))/(1000*60*60*24)):999;
     if(d>maxDays){maxDays=d;nextMu={key:k,label:mu.label,color:mu.color,days:d===999?null:d};}
   });
