@@ -427,8 +427,6 @@ body { font-size: 16px !important; }
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
   gap: 8px !important;
-  max-height: none !important;
-  overflow: visible !important;
 }
 .sh-sp-grid .stamp {
   min-height: 56px !important;
@@ -461,8 +459,6 @@ body { font-size: 16px !important; }
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
   gap: 8px !important;
-  max-height: none !important;
-  overflow: visible !important;
 }
 .wk-sp-grid .stamp {
   min-height: 56px !important;
@@ -550,12 +546,11 @@ body { font-size: 16px !important; }
   </div>
   <div class="sh-summary">
     <div class="sh-summary-left">
-      <div class="lbl" id="sh-month-lbl">合計</div>
-      <div class="sub" id="sh-sub"></div>
+      <div class="lbl" id="sh-month-lbl" style="font-size:13px;font-weight:600;color:var(--text)">合計</div>
     </div>
     <div class="sh-summary-right">
       <button id="bulk-btn"><i class="ti ti-calendar-plus" style="font-size:11px;margin-right:2px"></i>一括</button>
-      <div id="sh-total">¥0</div>
+      <div id="sh-total" style="font-size:18px;font-weight:700;color:var(--acc)">¥0</div>
     </div>
   </div>
   <div class="dow" id="sh-dow" style="flex-shrink:0"></div>
@@ -1193,7 +1188,7 @@ function updShTotal(){
   var sp=ms.filter(function(s){return s.type==='sp';}).length;
   var oc=ms.filter(function(s){return s.type==='oc';}).length;
   var r=getTaxRates();
-  g('sh-sub').textContent='手取合計 SPT:'+sp+'件 待機:'+oc+'件 (SPT'+r.spRate+'% 待機'+r.ocRate+'%)';
+  var shSub=g('sh-sub'); if(shSub) shSub.textContent='手取合計 SPT:'+sp+'件 待機:'+oc+'件 (SPT'+r.spRate+'% 待機'+r.ocRate+'%)';;
 }
 
 function renderShStamps(){
