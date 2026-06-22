@@ -23,7 +23,7 @@
   --green:#059669;--green-bg:#ecfdf5;
   --red:#dc2626;--orange:#d97706;
   --purple:#7c3aed;
-  --r:10px;--rs:6px;--navh:56px;
+  --r:10px;--rs:6px;--navh:52px;
   /* safe-area は body.is-pwa ブロック内で管理 */
 }
 [data-theme="dark"]{
@@ -38,28 +38,28 @@
 html{background:var(--bg)}
 body{width:100%;min-height:100dvh;overflow-x:hidden;overflow-y:hidden;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:var(--text);font-size:16px;max-width:430px;margin:0 auto}
 /* ナビ */
-#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:0}
 .nb{flex:1;padding:8px 4px 6px;border:none;background:none;color:var(--text3);font-size:9px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .15s}
 .nb i{font-size:22px}
 .nb.on{color:var(--acc)}
 /* ページ */
 .pg{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:var(--navh);flex-direction:column;overflow:hidden;align-items:stretch}
 .pg.on{display:flex}
-.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:10px}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:16px}
 /* ヘッダー */
-.ph{background:var(--bg2);padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.ph-title{font-size:16px;font-weight:700}
-.ch{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
-.ch h3{font-size:15px;font-weight:600}
+.ph{background:var(--bg2);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ph-title{font-size:17px;font-weight:700}
+.ch{background:var(--bg2);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
+.ch h3{font-size:16px;font-weight:600}
 .cnb{background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;padding:4px 8px}
 /* カード */
-.card{background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin:0 12px 14px;overflow:hidden}
-.card-title{padding:8px 12px 6px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.card{background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin:0 14px 12px;overflow:hidden}
+.card-title{padding:10px 14px 8px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
 .card-body{padding:14px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stat{background:var(--bg3);border-radius:var(--rs);padding:10px 12px}
-.stat-l{font-size:13px;color:var(--text2);margin-bottom:3px}
-.stat-v{font-size:22px;font-weight:700}
+.stat-l{font-size:11px;color:var(--text2);margin-bottom:3px}
+.stat-v{font-size:20px;font-weight:700}
 .stat-s{font-size:10px;color:var(--text3);margin-top:2px}
 .stat.acc{background:var(--acc-bg)}.stat.acc .stat-v{color:var(--acc)}
 .stat.grn{background:var(--green-bg)}.stat.grn .stat-v{color:var(--green)}
@@ -286,10 +286,10 @@ body.is-pwa {
   padding-bottom: var(--_sab) !important;
 }
 .is-pwa .nb {
-  padding: 6px 4px 5px;
+  padding: 5px 4px 4px;
   font-size: 9px;
 }
-.is-pwa .nb i { font-size: 20px; }
+.is-pwa .nb i { font-size: 19px; }
 
 /* --------------------------------------------------
    topbar (保存バッジ + 再読み込みFAB)
@@ -298,17 +298,17 @@ body.is-pwa {
   top:          var(--_sat) !important;
   padding:      3px 12px 2px;
 }
-.is-pwa #save-badge  { font-size: 9px; padding: 2px 7px; }
-.is-pwa #reload-fab  { width: 26px; height: 26px; font-size: 14px; }
+.is-pwa #save-badge  { font-size: 8px; padding: 1px 6px; }
+.is-pwa #reload-fab  { width: 24px; height: 24px; font-size: 13px; }
 
 /* --------------------------------------------------
-   ヘッダー .ch: safe-area確保のみ、padding はベース踏襲
+   ヘッダー .ch: ノッチ/DynamicIsland 分を確保
    -------------------------------------------------- */
 .is-pwa .ch {
   padding-top:    calc(6px + var(--_sat)) !important;
-  padding-bottom: 6px;
+  padding-bottom: 5px;
 }
-.is-pwa .ch h3  { font-size: 15px; }
+.is-pwa .ch h3  { font-size: 14px; }
 .is-pwa .cnb    { font-size: 20px; padding: 3px 6px; }
 .is-pwa #pg-home .ch .cnb:last-child { margin-right: 64px; }
 
@@ -317,13 +317,13 @@ body.is-pwa {
   padding-top:    calc(8px + var(--_sat)) !important;
   padding-bottom: 8px;
 }
-.is-pwa .ph-title { font-size: 16px; }
+.is-pwa .ph-title { font-size: 15px; }
 
 /* --------------------------------------------------
    今月の合計バー
    -------------------------------------------------- */
 .is-pwa .sh-summary               { padding: 5px 12px; }
-.is-pwa .sh-summary-left .lbl     { font-size: 11px; }
+.is-pwa .sh-summary-left .lbl     { font-size: 10px; }
 .is-pwa .sh-summary-left .sub     { font-size:  9px; }
 .is-pwa #sh-total                 { font-size: 15px; }
 .is-pwa #bulk-btn                 { padding: 4px 8px; font-size: 10px; }
@@ -331,212 +331,106 @@ body.is-pwa {
 /* --------------------------------------------------
    曜日ヘッダー行
    -------------------------------------------------- */
-.is-pwa .dow-c { padding: 4px 0; font-size: 11px; }
+.is-pwa .dow-c { padding: 3px 0; font-size: 10px; }
 
 /* --------------------------------------------------
    カレンダーセル: PWA時は高さを抑える
    -------------------------------------------------- */
-.is-pwa .cd       { min-height: 44px !important; padding: 2px 3px; }
-.is-pwa .dn       { font-size: 11px; width: 21px; height: 21px; }
-.is-pwa .ev       { font-size: 8px; padding: 0 2px; margin-bottom: 1px; }
+.is-pwa .cd       { min-height: 40px !important; padding: 1px 2px; }
+.is-pwa .dn       { font-size: 11px; width: 20px; height: 20px; }
+.is-pwa .ev       { font-size: 8px; padding: 0 2px; margin-bottom: 0; }
 
 /* --------------------------------------------------
-   スタンプエリア: 2列
+   スタンプエリア: 2列・高さ圧縮
    -------------------------------------------------- */
-.is-pwa .sp-panel          { padding: 4px 12px 3px; }
-.is-pwa .sp-hd             { margin-bottom: 3px; }
-.is-pwa .sp-hd span        { font-size: 11px; }
-.is-pwa .sp-hint           { padding: 2px 0 0; font-size: 9px; }
+.is-pwa .sp-panel          { padding: 3px 10px 2px; }
+.is-pwa .sp-hd             { margin-bottom: 2px; }
+.is-pwa .sp-hd span        { font-size: 10px; }
+.is-pwa .sp-hint           { padding: 1px 0 0; font-size: 9px; }
 .is-pwa .sp-grid {
   grid-template-columns: repeat(2, 1fr) !important;
-  gap: 4px;
-  max-height: 68px;
+  gap: 3px;
+  max-height: 62px;
 }
-.is-pwa .stamp             { padding: 4px 5px; gap: 1px; }
+.is-pwa .stamp             { padding: 3px 4px; gap: 0; }
 .is-pwa .stamp .sn         { font-size: 10px; }
-.is-pwa .stamp .st         { font-size:  9px; }
+.is-pwa .stamp .st         { font-size:  8px; }
 
 /* --------------------------------------------------
    設定フォーム
    -------------------------------------------------- */
 .is-pwa .stab    { padding: 7px 4px; font-size: 10px; }
-.is-pwa .ssi     { padding: 10px 14px; }
+.is-pwa .ssi     { padding: 9px 14px; }
 .is-pwa .ssi-l   { font-size: 13px; }
-.is-pwa .ssi-s   { font-size: 11px; }
-.is-pwa .li      { padding: 9px 14px; }
+.is-pwa .ssi-s   { font-size: 10px; }
+.is-pwa .li      { padding: 8px 14px; }
 .is-pwa .stl     { margin-bottom: 6px; }
-.is-pwa .li-nm   { font-size: 13px; }
+.is-pwa .li-nm   { font-size: 12px; }
 .is-pwa .li-dt   { font-size: 10px; }
 
-/* ===== Compact override — 実クラス名で !important 強制適用 ===== */
+/* ===== 見やすさ調整 v20260622 ===== */
 
-/* ---- ナビ ---- */
-#nav {
-  height: var(--navh) !important;
-  padding-bottom: 0 !important;
-}
-.nb {
-  padding: 6px 4px 4px !important;
-  font-size: 9px !important;
-}
-.nb i { font-size: 20px !important; }
+/* 本文フォント */
+body { font-size: 16px !important; }
 
-/* ---- 月ヘッダー (.ch) ---- */
-.ch {
-  padding: 6px 16px !important;
-  min-height: unset !important;
-}
-.ch h3 { font-size: 15px !important; }
-.cnb   { font-size: 20px !important; padding: 3px 6px !important; }
-
-/* ---- 設定/収入ページヘッダー (.ph) ---- */
-.ph {
-  padding: 10px 16px !important;
-  min-height: unset !important;
-}
-.ph-title { font-size: 16px !important; }
+/* ---- ヘッダー ---- */
+.ch { padding: 12px 16px !important; }
+.ch h3 { font-size: 17px !important; font-weight: 700 !important; }
+.cnb { font-size: 22px !important; padding: 4px 8px !important; }
+.ph { padding: 14px 16px !important; }
+.ph-title { font-size: 18px !important; }
 
 /* ---- カード ---- */
-.card {
-  margin: 0 12px 9px !important;
-}
-.card-title {
-  padding: 8px 12px 6px !important;
-  font-size: 11px !important;
-}
-.card-body { padding: 12px !important; }
+.card { margin: 0 14px 16px !important; }
+.card-title { padding: 12px 16px 10px !important; font-size: 13px !important; }
+.card-body { padding: 16px !important; }
+.grid2 { gap: 12px !important; }
+.stat { padding: 12px 14px !important; }
+.stat-l { font-size: 13px !important; margin-bottom: 4px !important; }
+.stat-v { font-size: 22px !important; font-weight: 700 !important; }
+.stat-s { font-size: 12px !important; }
 
-/* ---- stat ボックス ---- */
-.grid2 { gap: 8px !important; }
-.stat  { padding: 8px 10px !important; }
-.stat-v { font-size: 18px !important; }
-.stat-l { font-size: 11px !important; margin-bottom: 2px !important; }
-.stat-s { font-size: 10px !important; margin-top: 1px !important; }
+/* ---- カレンダー ---- */
+.dow-c { padding: 7px 0 !important; font-size: 13px !important; }
+.cd { min-height: 52px !important; padding: 3px 4px !important; }
+.dn-d { font-size: 13px !important; }
 
-/* ---- スクロール領域 ---- */
-.scroll { padding-bottom: 10px !important; }
+/* ---- 下部タブ ---- */
+#nav { height: 64px !important; }
+.nb { padding: 10px 4px 8px !important; font-size: 11px !important; }
+.nb i { font-size: 24px !important; }
 
-/* ---- inline style で残っているpadding上書き ---- */
-/* シフトページ・収入ページのinline padding:14px */
-#pg-shift  .scroll > div[style*="padding:14px"],
-#pg-income .scroll > div[style*="padding:14px"] {
-  padding: 10px !important;
+/* ---- スタンプ (勤務・筋トレ共通) ---- */
+.sh-sp-grid, .wk-sp-grid {
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
 }
-
-/* ---- PWA safe-area 上書き (is-pwa が付いた場合) ---- */
-.is-pwa #nav {
-  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
-}
-.is-pwa .pg {
-  top:    env(safe-area-inset-top, 0px) !important;
-  bottom: calc(var(--navh) + env(safe-area-inset-bottom, 0px)) !important;
-}
-.is-pwa .ch {
-  padding-top: calc(6px + env(safe-area-inset-top, 0px)) !important;
-}
-.is-pwa .ph {
-  padding-top: calc(8px + env(safe-area-inset-top, 0px)) !important;
-}
-.is-pwa #pwa-topbar {
-  top: env(safe-area-inset-top, 0px) !important;
-}
-
-/* ===== 筋トレスタンプグリッド (押しやすい2列) ===== */
-.wk-sp-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
-}
+.sh-sp-grid .stamp,
 .wk-sp-grid .stamp {
-  padding: 7px 6px !important;
-  border-radius: 8px !important;
-  min-height: 44px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 2px !important;
+  padding: 10px 10px !important;
+  min-height: 52px !important;
+  border-radius: 10px !important;
 }
-.wk-sp-grid .stamp .sn {
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  width: 100%;
-}
-.wk-sp-grid .stamp .st {
-  font-size: 9px !important;
-  opacity: .75;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-}
-.wk-sp-grid .stamp.on {
-  outline: 2px solid var(--purple) !important;
-  outline-offset: 1px;
-}
-/* is-pwa: 同サイズ維持 */
-.is-pwa .wk-sp-grid .stamp {
-  padding: 7px 6px !important;
-  min-height: 42px;
-}
-.is-pwa .wk-sp-grid .stamp .sn { font-size: 11px !important; }
-.is-pwa .wk-sp-grid .stamp .st { font-size:  9px !important; }
+.sh-sp-grid .stamp .sn,
+.wk-sp-grid .stamp .sn { font-size: 13px !important; }
+.sh-sp-grid .stamp .st,
+.wk-sp-grid .stamp .st { font-size: 11px !important; }
 
-/* ===== 勤務スタンプグリッド (2列・押しやすい) ===== */
-.sh-sp-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
-}
-.sh-sp-grid .stamp {
-  padding: 7px 6px !important;
-  border-radius: 8px !important;
-  min-height: 44px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 2px !important;
-}
-.sh-sp-grid .stamp .sn {
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  width: 100%;
-}
-.sh-sp-grid .stamp .st {
-  font-size: 9px !important;
-  opacity: .75;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-}
-.sh-sp-grid .stamp.on {
-  outline: 2px solid var(--acc) !important;
-  outline-offset: 1px;
-}
+/* ---- pg bottom: navh に合わせる ---- */
+.pg { bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important; }
+#nav { padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
 
-/* ===== カレンダーセル: flex:1ラッパー内で高さを均等に伸ばす ===== */
-#pg-shift  .cd,
-#pg-workout .cd {
-  min-height: 0;        /* grid の align-content:stretch に任せる */
-  height: 100%;
-}
-/* is-pwa: スタンプサイズ維持 */
-.is-pwa .sh-sp-grid .stamp {
-  padding: 10px 12px !important;
-  min-height: 48px;
-}
-.is-pwa .sh-sp-grid .stamp .sn { font-size: 13px !important; }
-.is-pwa .sh-sp-grid .stamp .st { font-size: 10px !important; }
+/* ---- scroll 上部余白 ---- */
+.scroll { padding-top: 8px !important; padding-bottom: 16px !important; }
 </style>
 </head>
 <body>
 
 <!-- PWA topbar: 保存バッジ + 再読み込みボタン -->
-<span id="save-badge" style="display:none">保存済み</span>
+<div id="pwa-topbar">
+  <span id="save-badge">保存済み</span>
+  <button id="reload-fab" onclick="reloadApp(false)" title="再読み込み">↻</button>
+</div>
 
 <!-- ホーム -->
 <div class="pg on" id="pg-home">
@@ -1603,11 +1497,89 @@ function renderIncomeInputs(){
 
 // ========== グラフ ==========
 function renderShTrend(){
-  // 勤務回数推移は非表示（sh-trend は display:none）
+  var el=g('sh-trend'); if(!el) return;
+  var now=new Date();
+  var months=[];
+  for(var i=5;i>=0;i--){
+    var d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    var y=d.getFullYear(),m=d.getMonth();
+    var ms=D.shifts.filter(function(s){var sd=new Date(s.date);return sd.getFullYear()===y&&sd.getMonth()===m;});
+    months.push({label:(m+1)+'月',total:ms.length,sp:ms.filter(function(s){return s.type==='sp';}).length,oc:ms.filter(function(s){return s.type==='oc';}).length});
+  }
+  var maxT=Math.max.apply(null,months.map(function(m){return m.total;}))||1;
+  var html='<div style="font-size:11px;color:var(--text2);margin-bottom:10px">勤務回数推移（過去6ヶ月）</div>';
+  months.forEach(function(mo){
+    var pw=Math.round(mo.total/maxT*100);
+    var sw=Math.round(mo.sp/maxT*100);
+    var ow=Math.round(mo.oc/maxT*100);
+    html+='<div class="bar-row"><div class="bar-label">'+mo.label+'</div>';
+    html+='<div style="flex:1"><div style="display:flex;gap:2px;margin-bottom:2px">';
+    html+='<div style="height:14px;width:'+pw+'%;background:var(--acc);border-radius:3px;opacity:.7;min-width:'+(mo.total>0?4:0)+'px"></div></div>';
+    html+='<div style="display:flex;gap:6px;font-size:9px;color:var(--text3)"><span>SPT:'+mo.sp+'</span><span>待機:'+mo.oc+'</span><span>計:'+mo.total+'</span></div></div>';
+    html+='<div class="bar-val">'+mo.total+'</div></div>';
+  });
+  // 凡例
+  html+='<div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:var(--text2)">'
+    +'<span>■ <span style="color:var(--acc)">合計</span></span>'
+    +'<span>SPT:スポット 待機:待機</span></div>';
+  el.innerHTML=html;
 }
 
 function renderWkTrend(){
-  // 回数推移は非表示（wk-trend は display:none）
+  var el=g('wk-trend'); if(!el) return;
+  var now=new Date();
+  var months=[];
+  for(var i=5;i>=0;i--){
+    var d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    var y=d.getFullYear(),m=d.getMonth();
+    var wks=D.workouts.filter(function(w){var wd=new Date(w.date);return wd.getFullYear()===y&&wd.getMonth()===m;});
+    var byM={};D.mkeys.forEach(function(k){byM[k]=0;});
+    wks.forEach(function(w){if(byM[w.muscle]!==undefined)byM[w.muscle]++;});
+    months.push({label:(m+1)+'月',total:wks.length,byM:byM});
+  }
+  var maxT=Math.max.apply(null,months.map(function(m){return m.total;}))||1;
+  var html='<div style="font-size:11px;color:var(--text2);margin-bottom:10px">筋トレ回数推移（過去6ヶ月）</div>';
+  // 積み上げ棒グラフ
+  html+='<div style="display:flex;align-items:flex-end;gap:6px;height:70px;margin-bottom:6px">';
+  months.forEach(function(mo){
+    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center">';
+    html+='<div style="font-size:9px;color:var(--text3);margin-bottom:2px">'+(mo.total||'')+'</div>';
+    html+='<div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:54px;gap:1px">';
+    if(mo.total===0){html+='<div style="width:100%;height:3px;background:var(--border);border-radius:2px;margin-top:auto"></div>';}
+    else{
+      D.mkeys.slice().reverse().forEach(function(k){
+        var cnt=mo.byM[k]||0; if(cnt===0) return;
+        var h=Math.max(4,Math.round(cnt/maxT*54));
+        var col=(D.muscles[k]&&D.muscles[k].color)||'#888';
+        html+='<div style="width:100%;height:'+h+'px;background:'+col+';border-radius:2px 2px 0 0;opacity:.85"></div>';
+      });
+    }
+    html+='</div></div>';
+  });
+  html+='</div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:8px">';
+  months.forEach(function(mo){html+='<div style="flex:1;text-align:center;font-size:9px;color:var(--text2)">'+mo.label+'</div>';});
+  html+='</div>';
+  // 凡例
+  html+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+  D.mkeys.forEach(function(k){var m=D.muscles[k];if(!m)return;html+='<div style="display:flex;align-items:center;gap:3px"><div style="width:10px;height:10px;background:'+m.color+';border-radius:2px"></div><span style="font-size:10px;color:var(--text2)">'+m.label+'</span></div>';});
+  html+='</div>';
+  // 月別テーブル
+  html+='<div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px">';
+  html+='<div style="display:grid;grid-template-columns:36px repeat(6,1fr);gap:3px;font-size:10px;font-weight:600;color:var(--text3);margin-bottom:4px"><div></div>';
+  months.forEach(function(mo){html+='<div style="text-align:center">'+mo.label+'</div>';});
+  html+='</div>';
+  D.mkeys.forEach(function(k){
+    var m=D.muscles[k];if(!m)return;
+    html+='<div style="display:grid;grid-template-columns:36px repeat(6,1fr);gap:3px;font-size:11px;margin-bottom:3px">';
+    html+='<div style="font-weight:600;color:'+m.color+'">'+m.label+'</div>';
+    months.forEach(function(mo){var cnt=mo.byM[k]||0;html+='<div style="text-align:center;font-weight:600;color:'+(cnt>0?m.color:'var(--text3)')+'">'+cnt+'</div>';});
+    html+='</div>';
+  });
+  html+='<div style="display:grid;grid-template-columns:36px repeat(6,1fr);gap:3px;font-size:11px;border-top:1px solid var(--border);padding-top:3px"><div style="color:var(--text2);font-weight:700">計</div>';
+  months.forEach(function(mo){html+='<div style="text-align:center;font-weight:700;color:var(--text)">'+mo.total+'</div>';});
+  html+='</div></div>';
+  el.innerHTML=html;
 }
 
 // ========== 一括登録 ==========
