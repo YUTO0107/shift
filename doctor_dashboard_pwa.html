@@ -1873,9 +1873,9 @@ renderShTrend();
 (function(){
   setTimeout(function(){ setSaveStatus('saved'); }, 800);
 })();
-// ===== カレンダー左右スワイプで月移動 =====
+// ===== 左右スワイプで月移動 =====
 (function(){
-  function addSwipe(elId, prevFn, nextFn){
+  function addSwipe(elId, onPrev, onNext){
     var el = document.getElementById(elId);
     if(!el) return;
     var startX = 0, startY = 0;
@@ -1886,43 +1886,33 @@ renderShTrend();
     el.addEventListener('touchend', function(e){
       var dx = e.changedTouches[0].clientX - startX;
       var dy = e.changedTouches[0].clientY - startY;
-      if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40){
-        if(dx < 0) nextFn();
-        else prevFn();
+      if(Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)){
+        if(dx < 0) onNext(); else onPrev();
       }
     }, {passive:true});
   }
+
+  // ホーム: HOME_M を直接操作して renderHome() を呼ぶ
+  function homePrev(){ HOME_M--; renderHome(); }
+  function homeNext(){ HOME_M++; renderHome(); }
+
+  // 勤務: 既存の calPrev/calNext を呼ぶ
+  function shPrev(){ var b=document.getElementById('sh-prev'); if(b) b.click(); }
+  function shNext(){ var b=document.getElementById('sh-next'); if(b) b.click(); }
+
+  // 筋トレ: 既存の calPrev/calNext を呼ぶ
+  function wkPrev(){ var b=document.getElementById('wk-prev'); if(b) b.click(); }
+  function wkNext(){ var b=document.getElementById('wk-next'); if(b) b.click(); }
+
   window.addEventListener('load', function(){
-    // 勤務カレンダー
-    addSwipe('sh-cal',
-      function(){ var b=document.getElementById('sh-prev'); if(b) b.click(); },
-      function(){ var b=document.getElementById('sh-next'); if(b) b.click(); }
-    );
-    // 筋トレカレンダー
-    addSwipe('wk-cal',
-      function(){ var b=document.getElementById('wk-prev'); if(b) b.click(); },
-      function(){ var b=document.getElementById('wk-next'); if(b) b.click(); }
-    );
-    // ホームカレンダー（収入月ナビ）
-    addSwipe('h-cal',
-      function(){ var b=document.getElementById('h-prev'); if(b) b.click(); },
-      function(){ var b=document.getElementById('h-next'); if(b) b.click(); }
-    );
-    // ホームページ全体もスワイプ対応
-    addSwipe('pg-home',
-      function(){ var b=document.getElementById('h-prev'); if(b) b.click(); },
-      function(){ var b=document.getElementById('h-next'); if(b) b.click(); }
-    );
-    // 勤務ページ全体もスワイプ対応
-    addSwipe('pg-shift',
-      function(){ var b=document.getElementById('sh-prev'); if(b) b.click(); },
-      function(){ var b=document.getElementById('sh-next'); if(b) b.click(); }
-    );
-    // 筋トレページ全体もスワイプ対応
-    addSwipe('pg-workout',
-      function(){ var b=document.getElementById('wk-prev'); if(b) b.click(); },
-      function(){ var b=document.getElementById('wk-next'); if(b) b.click(); }
-    );
+    // ホーム全体
+    addSwipe('pg-home', homePrev, homeNext);
+    // 勤務全体
+    addSwipe('pg-shift', shPrev, shNext);
+    addSwipe('sh-cal',   shPrev, shNext);
+    // 筋トレ全体
+    addSwipe('pg-workout', wkPrev, wkNext);
+    addSwipe('wk-cal',     wkPrev, wkNext);
   });
 })();
 
