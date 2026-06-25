@@ -822,6 +822,17 @@ function stName(s){if(s.stampId){var t=D.stamps.filter(function(x){return x.id==
 function ftG(){return D.ft.annualGross?Math.round(D.ft.annualGross/12):0;} // 月額換算（参考用）
 function ftN(){return D.ft.monthlyNet||0;}
 function getTaxRates(){return Object.assign({ftNet:850000,ocRate:85,spRate:85},D.taxRates||{});}
+function calcGross(shifts){
+  // 額面収入計算（手取り率を適用しない）
+  var r=getTaxRates();
+  var ftNet=r.ftNet||850000; // 常勤は設定値をそのまま使う
+  var hasFt=shifts.some(function(s){return s.type==='ft';});
+  var ft=hasFt?ftNet:0;
+  var oc=shifts.filter(function(s){return s.type==='oc';}).reduce(function(a,s){return a+(+s.amount||0);},0);
+  var sp=shifts.filter(function(s){return s.type==='sp';}).reduce(function(a,s){return a+(+s.amount||0);},0);
+  var other=shifts.filter(function(s){return s.type==='pt';}).reduce(function(a,s){return a+(+s.amount||0)+(+s.transport||0);},0);
+  return ft + oc + sp + other;
+}
 function calcTakeHome(shifts){
   // 手取りベースの収入計算
   var r=getTaxRates();
@@ -1183,12 +1194,16 @@ function onDayTap(mode,ds){
 function updShTotal(){
   var c=CAL.sh,y=Math.floor(c/12),m=c%12;
   var ms=D.shifts.filter(function(s){var d=new Date(s.date);return d.getFullYear()===y&&d.getMonth()===m;});
+  var gross=calcGross(ms);
   var takeHome=calcTakeHome(ms);
-  g('sh-total').textContent='¥'+fmt(takeHome);
-  var sp=ms.filter(function(s){return s.type==='sp';}).length;
-  var oc=ms.filter(function(s){return s.type==='oc';}).length;
-  var r=getTaxRates();
-  var shSub=g('sh-sub'); if(shSub) shSub.textContent='手取合計 SPT:'+sp+'件 待機:'+oc+'件 (SPT'+r.spRate+'% 待機'+r.ocRate+'%)';;
+  // 手入力優先
+  var key=y+'-'+m;
+  if(Object.prototype.hasOwnProperty.call(D.incomeOverrides,key)){
+    gross=parseFloat(D.incomeOverrides[key])||gross;
+  }
+  var shTotal=g('sh-total');
+  if(shTotal) shTotal.innerHTML='¥'+fmt(gross)+'<div style="font-size:11px;font-weight:400;color:var(--text2);margin-top:2px">予想手取り ¥'+fmt(takeHome)+'</div>';
+  var shSub=g('sh-sub'); if(shSub) shSub.textContent='';
 }
 
 function renderShStamps(){
@@ -1487,19 +1502,23 @@ function renderCumulative(){
   var el=g('h-cumulative'); if(!el) return;
   var now=new Date();
   var y=now.getFullYear();
-  // 手入力済みの月だけ合計（自動計算は使わない）
   var total=0;
   for(var m=0;m<12;m++){
     var key=y+'-'+m;
     if(Object.prototype.hasOwnProperty.call(D.incomeOverrides,key)){
+      // 手入力優先
       total+=parseFloat(D.incomeOverrides[key])||0;
+    } else {
+      // 手入力なし→カレンダー由来の額面を使用
+      var ms=D.shifts.filter(function(s){var d=new Date(s.date);return d.getFullYear()===y&&d.getMonth()===m;});
+      total+=calcGross(ms);
     }
   }
   el.innerHTML=
     '<div style="background:var(--bg3);border-radius:var(--rs);padding:12px 14px">'
     +'<div style="font-size:11px;color:var(--text2);margin-bottom:4px">総収入（額面）</div>'
     +'<div style="font-size:24px;font-weight:700;color:var(--text)">¥'+fmt(total)+'</div>'
-    +'<div style="font-size:10px;color:var(--text3);margin-top:4px">'+y+'年 手入力済み月の合計</div>'
+    +'<div style="font-size:10px;color:var(--text3);margin-top:4px">'+y+'年 額面収入合計</div>'
     +'</div>';
 }
 
@@ -1509,15 +1528,20 @@ function renderHome(){
   if(htEl) htEl.textContent=y+'年'+(m+1)+'月';
   // 勤務集計（選択月）
   var ms=D.shifts.filter(function(s){var d=new Date(s.date);return d.getFullYear()===y&&d.getMonth()===m;});
-  var baite=ms.filter(function(s){return s.type!=='ft';}).reduce(function(a,s){return a+(+s.amount||0)+(+s.transport||0);},0);
+  // 額面・手取り計算
+  var gross=calcGross(ms);
+  var takeHome=calcTakeHome(ms);
+  // 手入力優先
+  var key=y+'-'+m;
+  if(Object.prototype.hasOwnProperty.call(D.incomeOverrides,key)){
+    gross=parseFloat(D.incomeOverrides[key])||gross;
+  }
   var spCnt=ms.filter(function(s){return s.type==='sp';}).length;
   var ocCnt=ms.filter(function(s){return s.type==='oc';}).length;
-  var total=calcTakeHome(ms); // 手取りベース
   if(g('h-income')) g('h-income').innerHTML=
-    '<div class="stat acc"><div class="stat-l">'+y+'/'+(m+1)+' 収入</div><div class="stat-v">¥'+fmt(total)+'</div></div>'
+    '<div class="stat acc" style="grid-column:span 2"><div class="stat-l">'+y+'/'+(m+1)+' 収入（額面）</div><div class="stat-v">¥'+fmt(gross)+'</div><div class="stat-s" style="color:var(--text2)">予想手取り ¥'+fmt(takeHome)+'</div></div>'
     +'<div class="stat"><div class="stat-l">勤務回数</div><div class="stat-v">'+ms.length+'回</div></div>'
-    +'<div class="stat"><div class="stat-l">スポット</div><div class="stat-v" style="color:var(--orange)">'+spCnt+'回</div></div>'
-    +'<div class="stat"><div class="stat-l">待機</div><div class="stat-v" style="color:var(--red)">'+ocCnt+'回</div></div>';
+    +'<div class="stat"><div class="stat-l">スポット</div><div class="stat-v" style="color:var(--orange)">'+spCnt+'回</div></div>';
   // 筋トレ（選択月）
   var today2=new Date();today2.setHours(0,0,0,0);
   var wkThisM=D.workouts.filter(function(w){var d=new Date(w.date);return d.getFullYear()===y&&d.getMonth()===m;});
