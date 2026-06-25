@@ -945,6 +945,91 @@ function load(){
     if(p.taxRates) D.taxRates=Object.assign({ftNet:850000,ocRate:85,spRate:85},p.taxRates);
     if(p.incomeOverrides) D.incomeOverrides=p.incomeOverrides;
   }catch(e){}
+
+  // myshift_v1 からのデータ統合
+  try{
+    var msRaw = localStorage.getItem('myshift_v1');
+    if(!msRaw) return;
+    var ms = JSON.parse(msRaw);
+    if(!ms) return;
+
+    // type変換マップ (myshift → このアプリ)
+    function convType(t){
+      if(t==='full_time'||t==='ft') return 'ft';
+      if(t==='spot'||t==='sp')      return 'sp';
+      if(t==='on_call'||t==='oc')   return 'oc';
+      if(t==='part_time'||t==='pt') return 'pt';
+      return 'pt'; // 不明は外勤扱い
+    }
+
+    // shifts: 既存IDと重複しないように統合
+    if(ms.shifts && ms.shifts.length){
+      // 全シフトの日付・type・amountをログ出力
+      console.log('[myshift] all shifts:');
+      ms.shifts.forEach(function(s){ console.log('  date:'+s.date+' type:'+s.type+' amount:'+s.amount); });
+      // schedules も確認
+      if(ms.schedules && ms.schedules.length){
+        console.log('[myshift] schedules sample:', JSON.stringify(ms.schedules[0]));
+      }
+      var existIds = D.shifts.map(function(s){return s.id;});
+      ms.shifts.forEach(function(s){
+        if(existIds.indexOf(s.id) < 0){
+          D.shifts.push({
+            id: s.id,
+            date: s.date,
+            type: convType(s.type),
+            place: s.place||'',
+            start: s.start||'',
+            end: s.end||'',
+            amount: +(s.amount)||0,
+            transport: +(s.transport)||0,
+            paid: s.paid||false,
+            paymentDate: s.paymentDate||'',
+            stampId: s.stampId||''
+          });
+        }
+      });
+    }
+
+    // stamps: 重複しないように統合
+    if(ms.stamps && ms.stamps.length){
+      var existStIds = D.stamps.map(function(s){return s.id;});
+      ms.stamps.forEach(function(s){
+        if(existStIds.indexOf(s.id) < 0){
+          D.stamps.push({
+            id: s.id,
+            name: s.name||'',
+            type: convType(s.type),
+            place: s.place||'',
+            start: s.start||'',
+            end: s.end||'',
+            amount: +(s.amount)||0,
+            transport: +(s.transport)||0,
+            color: s.color||''
+          });
+        }
+      });
+    }
+
+    // ft設定
+    if(ms.ft && !D.ft.monthlyNet){
+      if(ms.ft.monthlyNet) D.ft.monthlyNet = ms.ft.monthlyNet;
+      if(ms.ft.annualGross) D.ft.annualGross = ms.ft.annualGross;
+    }
+
+    // monthlyOverrides → incomeOverrides
+    if(ms.monthlyOverrides){
+      Object.keys(ms.monthlyOverrides).forEach(function(k){
+        if(!Object.prototype.hasOwnProperty.call(D.incomeOverrides, k)){
+          D.incomeOverrides[k] = ms.monthlyOverrides[k];
+        }
+      });
+    }
+
+    console.log('[load] myshift_v1 merged: shifts='+D.shifts.length+' stamps='+D.stamps.length);
+  }catch(e){
+    console.log('[load] myshift_v1 merge error:', e.message);
+  }
 }
 
 // ===== 再読み込み =====
@@ -1853,6 +1938,33 @@ function initEvents(){
 
 // ========== 起動 ==========
 load();
+// デバッグ: ロード後の状態確認
+(function(){
+  var rawMyshift = localStorage.getItem('myshift_v1');
+  console.log('[BOOT] myshift_v1 length:', rawMyshift ? rawMyshift.length : 'null');
+  if(rawMyshift){
+    try{
+      var ms = JSON.parse(rawMyshift);
+      console.log('[BOOT] myshift_v1 keys:', Object.keys(ms).join(','));
+      if(ms.shifts) console.log('[BOOT] myshift shifts.length:', ms.shifts.length, 'sample:', JSON.stringify(ms.shifts[0]));
+      if(ms.records) console.log('[BOOT] myshift records.length:', ms.records.length, 'sample:', JSON.stringify(ms.records[0]));
+    }catch(e){ console.log('[BOOT] myshift parse error:', e.message); }
+  }
+  var raw1 = localStorage.getItem('doctorDashboardData_v1');
+  var raw2 = localStorage.getItem('dd_beta_v1');
+  console.log('[BOOT] localStorage keys:', Object.keys(localStorage).join(','));
+  console.log('[BOOT] doctorDashboardData_v1 length:', raw1 ? raw1.length : 'null');
+  console.log('[BOOT] dd_beta_v1 length:', raw2 ? raw2.length : 'null');
+  console.log('[BOOT] D.shifts.length:', D.shifts.length);
+  console.log('[BOOT] D.stamps.length:', D.stamps.length);
+  if(D.shifts.length > 0) console.log('[BOOT] sample shift:', JSON.stringify(D.shifts[0]));
+  if(raw1) {
+    try {
+      var p = JSON.parse(raw1);
+      console.log('[BOOT] parsed shifts:', p.shifts ? p.shifts.length : 'none');
+    } catch(e) { console.log('[BOOT] parse error:', e.message); }
+  }
+})();
 applyTheme(D.settings.theme||'light');
 initEvents();
 renderHome();
