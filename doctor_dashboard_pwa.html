@@ -503,6 +503,11 @@ body { font-size: 16px !important; }
 
 /* ---- scroll 余白 ---- */
 .scroll { padding-top: 8px !important; padding-bottom: 16px !important; }
+
+/* ===== 消去モード ===== */
+.cd.del-mode { cursor: crosshair !important; }
+.cd.del-mode:hover { background: #fee2e2 !important; }
+[data-theme="dark"] .cd.del-mode:hover { background: #450a0a !important; }
 </style>
 </head>
 <body>
@@ -559,9 +564,14 @@ body { font-size: 16px !important; }
     <div class="cal" id="sh-cal" style="min-height:40vh;align-content:stretch"></div>
     <!-- スタンプパネル -->
     <div style="background:var(--bg2);border-top:3px solid var(--acc);padding:8px 12px 6px">
+    <!-- 消去モードバー -->
+    <div id="del-mode-bar-sh" style="display:none;background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;padding:6px 10px;margin-bottom:6px;align-items:center;gap:6px;font-size:11px;color:#dc2626;font-weight:600;">
+      <i class="ti ti-trash" style="font-size:13px"></i> 消去モード中 — 日付をタップすると削除
+    </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
       <span style="font-size:12px;font-weight:700;color:var(--text)"><i class="ti ti-stamp" style="font-size:13px;margin-right:4px;color:var(--acc)"></i>スタンプ</span>
       <div style="display:flex;gap:6px;align-items:center">
+        <button id="del-mode-btn-sh" onclick="toggleDeleteMode('sh')" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border2);border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">消去</button>
         <span id="multi-cnt" style="font-size:11px;color:var(--acc);display:none"></span>
         <button id="sh-st-add" style="background:none;border:1px solid var(--border2);border-radius:var(--rs);padding:3px 8px;font-size:11px;color:var(--text2);cursor:pointer">+ 追加</button>
       </div>
@@ -597,9 +607,16 @@ body { font-size: 16px !important; }
     <div class="cal" id="wk-cal" style="min-height:40vh;align-content:stretch"></div>
     <!-- スタンプパネル -->
     <div style="background:var(--bg2);border-top:3px solid var(--purple);padding:8px 12px 6px">
+      <!-- 消去モードバー -->
+      <div id="del-mode-bar-wk" style="display:none;background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;padding:6px 10px;margin-bottom:6px;align-items:center;gap:6px;font-size:11px;color:#dc2626;font-weight:600;">
+        <i class="ti ti-trash" style="font-size:13px"></i> 消去モード中 — 日付をタップすると削除
+      </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <span style="font-size:12px;font-weight:700;color:var(--text)"><i class="ti ti-barbell" style="font-size:13px;margin-right:4px;color:var(--purple)"></i>部位スタンプ</span>
-        <div id="wk-hint" style="font-size:10px;color:var(--text3)">部位選択 → 日付タップで記録</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button id="del-mode-btn-wk" onclick="toggleDeleteMode('wk')" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border2);border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">消去</button>
+          <div id="wk-hint" style="font-size:10px;color:var(--text3)">部位選択 → 日付タップで記録</div>
+        </div>
       </div>
       <div class="wk-sp-grid" id="wk-stamps"></div>
     </div>
@@ -807,6 +824,7 @@ var D={
 var CAL={sh:NOW.getFullYear()*12+NOW.getMonth(), wk:NOW.getFullYear()*12+NOW.getMonth()};
 var HOME_M=NOW.getFullYear()*12+NOW.getMonth(); // ホーム表示月
 var aShSt=null, aWkM=null, multiDs=[], selD={sh:null,wk:null};
+var deleteMode={sh:false,wk:false}; // 消去モード
 var editShId=null, editStId=null, editMuKey=null, editShType='ft', editStType='ft';
 var muColor='#ef4444', bulkM=NOW.getFullYear()*12+NOW.getMonth();
 var curSetTab='shift';
@@ -1034,14 +1052,21 @@ function load(){
 
 // ===== 再読み込み =====
 function reloadApp(forceLatest){
-  if(_isDirty){
-    if(!confirm('未保存のデータがあります。再読み込みしますか？')){return;}
-  }
   if(forceLatest){
+    // 最新版を強制取得
+    if(_isDirty && !confirm('未保存のデータがあります。続けますか？')) return;
     window.location.href = window.location.pathname + '?v=' + Date.now();
-  } else {
-    window.location.reload();
+    return;
   }
+  // 通常の更新ボタン: 最新設定で全データを再集計して再描画
+  load(); // localStorageから最新設定を再読み込み
+  setSaveStatus('saved');
+  renderHome();
+  renderCal('sh'); updShTotal();
+  renderCal('wk'); updWkCount();
+  renderMuCards();
+  renderCumulative();
+  console.log('[reloadApp] recalculated. shifts:', D.shifts.length);
 }
 
 // ========== テーマ ==========
@@ -1169,6 +1194,7 @@ function renderCal(mode){
     var isSel=selD[mode]===ds;
     var div=document.createElement('div');
     var clsArr=['cd'];
+    if(deleteMode[mode]) clsArr.push('del-mode');
     if(cell.other) clsArr.push('om');
     if(isRed&&!cell.other) clsArr.push('sun');
     if(isSat&&!cell.other) clsArr.push('sat');
@@ -1268,6 +1294,24 @@ function openDet(kind,id){
 
 // ========== 日付タップ ==========
 function onDayTap(mode,ds){
+  // 消去モード処理
+  if(deleteMode[mode]){
+    if(mode==='sh'){
+      var before=D.shifts.length;
+      D.shifts=D.shifts.filter(function(s){return s.date!==ds;});
+      console.log('[deleteMode] sh removed:', before-D.shifts.length, 'on', ds);
+    } else if(mode==='wk'){
+      var before2=D.workouts.length;
+      D.workouts=D.workouts.filter(function(w){return w.date!==ds;});
+      console.log('[deleteMode] wk removed:', before2-D.workouts.length, 'on', ds);
+    }
+    save();
+    renderCal(mode);
+    if(mode==='sh'){updShTotal();}
+    if(mode==='wk'){updWkCount();renderMuCards();}
+    renderHome();
+    return;
+  }
   selD[mode]=ds; renderCal(mode);
   if(mode==='sh'){
     if(aShSt){
@@ -1278,6 +1322,24 @@ function onDayTap(mode,ds){
     if(aWkM) addWk(ds,aWkM);
     else openWkDayModal(ds);
   }
+}
+
+// 消去モード切替
+function toggleDeleteMode(mode){
+  deleteMode[mode]=!deleteMode[mode];
+  var btn=document.getElementById('del-mode-btn-'+mode);
+  var bar=document.getElementById('del-mode-bar-'+mode);
+  if(btn){
+    if(deleteMode[mode]){
+      btn.textContent='消去モード中';
+      btn.style.cssText='background:#ef4444;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;';
+    } else {
+      btn.textContent='消去';
+      btn.style.cssText='background:var(--bg3);color:var(--text2);border:1px solid var(--border2);border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;';
+    }
+  }
+  if(bar) bar.style.display=deleteMode[mode]?'flex':'none';
+  renderCal(mode);
 }
 
 // ========== 勤務 ==========
