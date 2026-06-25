@@ -823,28 +823,33 @@ function ftG(){return D.ft.annualGross?Math.round(D.ft.annualGross/12):0;} // �
 function ftN(){return D.ft.monthlyNet||0;}
 function getTaxRates(){return Object.assign({ftNet:850000,ocRate:85,spRate:85},D.taxRates||{});}
 function calcGross(shifts){
-  // 額面収入計算（手取り率を適用しない）
+  // 額面収入: 全スタンプの amount をそのまま合計（手取り率なし）
+  // ft（常勤）は amount=0 なので ftNet を設定値から取得
   var r=getTaxRates();
-  var ftNet=r.ftNet||850000; // 常勤は設定値をそのまま使う
   var hasFt=shifts.some(function(s){return s.type==='ft';});
-  var ft=hasFt?ftNet:0;
-  var oc=shifts.filter(function(s){return s.type==='oc';}).reduce(function(a,s){return a+(+s.amount||0);},0);
-  var sp=shifts.filter(function(s){return s.type==='sp';}).reduce(function(a,s){return a+(+s.amount||0);},0);
-  var other=shifts.filter(function(s){return s.type==='pt';}).reduce(function(a,s){return a+(+s.amount||0)+(+s.transport||0);},0);
-  return ft + oc + sp + other;
+  var ftGross=hasFt?(r.ftNet||850000):0;
+  // ft以外の全スタンプの報酬を合算
+  var otherGross=shifts.filter(function(s){return s.type!=='ft';})
+    .reduce(function(a,s){return a+(+s.amount||0)+(+s.transport||0);},0);
+  console.log('[calcGross] shifts.length='+shifts.length+' ft='+ftGross+' other='+otherGross);
+  return ftGross + otherGross;
 }
 function calcTakeHome(shifts){
-  // 手取りベースの収入計算
+  // 手取り: oc/sp に手取り率を適用、pt はそのまま、ft は ftNet
   var r=getTaxRates();
-  var ftNet=r.ftNet||850000;
   var ocRate=(r.ocRate||85)/100;
   var spRate=(r.spRate||85)/100;
   var hasFt=shifts.some(function(s){return s.type==='ft';});
-  var ft=hasFt?ftNet:0;
-  var oc=shifts.filter(function(s){return s.type==='oc';}).reduce(function(a,s){return a+(+s.amount||0);},0);
-  var sp=shifts.filter(function(s){return s.type==='sp';}).reduce(function(a,s){return a+(+s.amount||0);},0);
-  var other=shifts.filter(function(s){return s.type==='pt';}).reduce(function(a,s){return a+(+s.amount||0)+(+s.transport||0);},0);
-  return ft + Math.round(oc*ocRate) + Math.round(sp*spRate) + other;
+  var ftTake=hasFt?(r.ftNet||850000):0;
+  var oc=shifts.filter(function(s){return s.type==='oc';})
+    .reduce(function(a,s){return a+(+s.amount||0);},0);
+  var sp=shifts.filter(function(s){return s.type==='sp';})
+    .reduce(function(a,s){return a+(+s.amount||0);},0);
+  var pt=shifts.filter(function(s){return s.type==='pt';})
+    .reduce(function(a,s){return a+(+s.amount||0)+(+s.transport||0);},0);
+  var take=ftTake + Math.round(oc*ocRate) + Math.round(sp*spRate) + pt;
+  console.log('[calcTakeHome] ft:', ftTake, 'oc:', oc, 'sp:', sp, 'pt:', pt, 'take:', take, 'rates:', ocRate, spRate);
+  return take;
 }
 function getShiftIncome(y,m){
   // 自動計算（勤務カレンダーから）: 手取りベース
@@ -1194,13 +1199,24 @@ function onDayTap(mode,ds){
 function updShTotal(){
   var c=CAL.sh,y=Math.floor(c/12),m=c%12;
   var ms=D.shifts.filter(function(s){var d=new Date(s.date);return d.getFullYear()===y&&d.getMonth()===m;});
+  console.log('[updShTotal] CAL.sh='+c+' y='+y+' m='+m+' D.shifts.length='+D.shifts.length+' ms.length='+ms.length+' HOME_M='+HOME_M);
+  if(ms.length>0) console.log('[updShTotal] sample shift:', JSON.stringify(ms[0]));
   var gross=calcGross(ms);
   var takeHome=calcTakeHome(ms);
-  // 手入力優先
+  // 手入力優先（額面・手取り両方）
   var key=y+'-'+m;
+  var keyNet=y+'-'+m+'-net';
   if(Object.prototype.hasOwnProperty.call(D.incomeOverrides,key)){
     gross=parseFloat(D.incomeOverrides[key])||gross;
+    // 手取りも手入力があれば優先、なければ額面×手取り率で再計算
+    if(Object.prototype.hasOwnProperty.call(D.incomeOverrides,keyNet)){
+      takeHome=parseFloat(D.incomeOverrides[keyNet])||takeHome;
+    } else {
+      // 手入力額面がある場合: 手取り = min(calcTakeHome結果, 手入力額面)
+      takeHome=Math.min(takeHome, gross);
+    }
   }
+  console.log('[renderHome]', y, m+1, 'gross:', gross, 'takeHome:', takeHome);
   var shTotal=g('sh-total');
   if(shTotal) shTotal.innerHTML='¥'+fmt(gross)+'<div style="font-size:11px;font-weight:400;color:var(--text2);margin-top:2px">予想手取り ¥'+fmt(takeHome)+'</div>';
   var shSub=g('sh-sub'); if(shSub) shSub.textContent='';
@@ -1531,11 +1547,13 @@ function renderHome(){
   // 額面・手取り計算
   var gross=calcGross(ms);
   var takeHome=calcTakeHome(ms);
-  // 手入力優先
+  // 手入力優先（額面・手取り両方）
   var key=y+'-'+m;
   if(Object.prototype.hasOwnProperty.call(D.incomeOverrides,key)){
     gross=parseFloat(D.incomeOverrides[key])||gross;
+    takeHome=Math.min(takeHome, gross);
   }
+  console.log('[renderHome] y='+y+' m='+(m+1)+' D.shifts.length='+D.shifts.length+' ms.length='+ms.length+' gross='+gross+' takeHome='+takeHome);
   var spCnt=ms.filter(function(s){return s.type==='sp';}).length;
   var ocCnt=ms.filter(function(s){return s.type==='oc';}).length;
   if(g('h-income')) g('h-income').innerHTML=
